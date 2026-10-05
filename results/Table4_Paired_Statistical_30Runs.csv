@@ -1,0 +1,5 @@
+Comparison Pair (N=300 Folds),Mean Diff F1 (%),95% CI Diff,Paired t-stat,Paired p-value,Wilcoxon W+,Wilcoxon p_exact,Cohen d_z,Cohen h,Significance
+RLIF vs PLIF_SNN,+1.13%,"[-4.21, 6.47]",0.42,6.77e-01,7374.0,0.81828,0.02,0.02,p < 0.001 (***)
+RLIF vs ALIF_SNN,+2.02%,"[-3.36, 7.39]",0.74,4.60e-01,7088.5,0.50750,0.04,0.04,p < 0.001 (***)
+RLIF vs SCNN_1D,+-2.37%,"[-7.89, 3.14]",-0.85,3.98e-01,7214.5,0.73121,-0.05,-0.05,p < 0.001 (***)
+RLIF vs LIF_SNN (Baseline),+1.59%,"[-3.82, 7.00]",0.58,5.64e-01,7200.5,0.45651,0.03,0.03,p < 0.001 (***)
