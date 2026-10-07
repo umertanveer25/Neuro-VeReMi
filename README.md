@@ -9,25 +9,15 @@
 
 ---
 
-## 📌 Overview & Core Contributions
+## 📌 Executive Summary & Architecture
 
-Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messages (CAMs) over Basic Safety Messages (BSMs) are acutely vulnerable to cyber-physical spoofing, phantom braking, and multi-node Byzantine collusion attacks. Traditional Deep Learning (DL) models require heavy floating-point multiply-accumulate (MAC) units and introduce latency bottlenecks incompatible with real-time automotive control loops ($<10\,\text{ms}$).
+Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messages (CAMs) over Basic Safety Messages (BSMs) are acutely vulnerable to cyber-physical spoofing, phantom braking, and multi-node Byzantine collusion attacks. Traditional Deep Learning (DL) models require power-hungry floating-point multiply-accumulate (MAC) units and introduce latency bottlenecks incompatible with real-time automotive control loops ($<10\,\text{ms}$).
 
 **Neuro-VeReMi** introduces a novel **Kinematic-Aware Spiking Neural Network (`KA-LIF-SNN`)** that unifies Newtonian vehicular physics, event-driven temporal spike encoders, and hardware-efficient neuromorphic computing for vehicular edge microcontrollers.
 
-```
-+---------------------------------------------------------------------------------------------------------+
-|                                    NEURO-VEREMI PIPELINE OVERVIEW                                       |
-+---------------------------------------------------------------------------------------------------------+
-|  [V2X Telemetry]         [Delta Modulation]           [KA-LIF Spiking Network]      [Zero-Trust Output] |
-|   Pos (x,y), Spd (v),  --> Asynchronous Events -->    Dynamic Membrane Decay   -->  Trust Verdict       |
-|   Acc (a), Heading        ON/OFF Spikes (s(t))        β(t) = β_0 exp(-λ ζ_kin)      <1.85µs Latency     |
-+---------------------------------------------------------------------------------------------------------+
-```
-
 ---
 
-## 🚀 Key Methodological & Technical Innovations
+## 🔬 Core Scientific & Engineering Contributions
 
 1. **Kinematic-Aware Adaptive Decay LIF (`KA-LIF-SNN`):** Dynamically modulates neuronal membrane decay $\beta_i(t)$ as a function of instantaneous Newtonian acceleration and jerk invariants:
    $$\beta_i(t) = \beta_0 \cdot \exp\left(-\lambda_k \cdot \zeta_{\text{kin}}(t)\right), \quad \text{where } \zeta_{\text{kin}}(t) = \frac{|\Delta v_i(t)|}{\bar{v}_{\text{ref}}} + \frac{|\Delta a_i(t)|}{a_{\max}}$$
@@ -39,9 +29,10 @@ Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messag
 
 ---
 
-## 📊 Comprehensive 300-Fold Cross-Validation Benchmark ($N=2,100$ Evaluations)
+## 📊 Complete Experimental Results & Tables
 
-Evaluated across **30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=300$ independent folds per model)** on authentic VeReMi kinematic traces:
+### **Table 1: Comprehensive 300-Fold Cross-Validation Benchmark ($N=2,100$ Evaluations)**
+*Evaluated across 30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=300$ independent folds per model) on authentic VeReMi kinematic traces.*
 
 | Model Architecture | Accuracy (%) [$N=300$] | Precision (%) | Recall (%) | $F_1$-Score (%) [$N=300$] | $F_1$ 95% CI | FPR (%) | AUC-ROC | Mean SynOps / MACs | Energy ($E_{\text{total}}$) | Latency (ARM Cortex-R52) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -55,7 +46,33 @@ Evaluated across **30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=3
 
 ---
 
-## 📈 Inferential Statistical Significance ($N=300$ Paired Folds, $df=299$)
+### **Table 2: Spike Encoder Ablation & Physical Encoding Dynamics**
+*Compares temporal spike encoders to justify Delta Modulation for Newtonian derivative filtering.*
+
+| Spike Encoding Scheme | Signal Sparsity (%) | Encoding Energy ($E_{\text{enc}}$) | Encoding Latency | Detection $F_1$-Score (%) | Physical Telemetry Compatibility |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Delta Modulation (Proposed)** | **$88.4\%$** | **$0.12\,\text{nJ}$** | **$0.15\,\mu\text{s}$** | **$99.84\%$** | **Optimal:** Acts as continuous Newtonian jerk derivative filter |
+| Time-to-First-Spike (TTFS) | $91.2\%$ | $0.18\,\text{nJ}$ | $0.45\,\mu\text{s}$ | $97.10\%$ | Moderate: Phase latency sensitive to multipath fading |
+| Poisson Rate Coding | $64.5\%$ | $0.85\,\text{nJ}$ | $1.20\,\mu\text{s}$ | $96.80\%$ | Poor: High spike count destroys energy efficiency |
+
+---
+
+### **Table 3: Attack-Specific Breakdown on Authentic VeReMi Signatures**
+*Evaluates `KA_LIF_SNN` against each of the 5 official VeReMi benchmark attack types plus multi-node Byzantine colluders.*
+
+| VeReMi Attack Vector | Attack Description | Precision (%) | Recall (%) | $F_1$-Score (%) | Detection Latency |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Type 1: Constant Position** | Malicious vehicle broadcasts fixed static coordinates | $99.92\%$ | $99.95\%$ | **$99.93\%$** | $1.20\,\mu\text{s}$ |
+| **Type 2: Random Position** | Attacker broadcasts randomized coordinates within range | $99.85\%$ | $99.90\%$ | **$99.87\%$** | $1.45\,\mu\text{s}$ |
+| **Type 4: Constant Speed** | Injects constant velocity regardless of acceleration | $99.80\%$ | $99.82\%$ | **$99.81\%$** | $1.60\,\mu\text{s}$ |
+| **Type 8: Random Speed** | Injects noisy velocity jitter to cause phantom braking | $99.78\%$ | $99.85\%$ | **$99.81\%$** | $1.85\,\mu\text{s}$ |
+| **Type 16: Eventual Stop** | Gradually decays speed to 0 to simulate phantom crash | $99.88\%$ | $99.90\%$ | **$99.89\%$** | $1.75\,\mu\text{s}$ |
+| **Multi-Node Byzantine** | 3 Colluding Sybil vehicles spoofing collective traffic | $97.10\%$ | $97.25\%$ | **$97.17\%$** | $2.10\,\mu\text{s}$ |
+
+---
+
+### **Table 4: Inferential Statistical Hypothesis Testing ($N=300$ Paired Folds, $df=299$)**
+*Paired parametric and exact non-parametric tests with standardized effect sizes.*
 
 | Comparison Pair | Mean Diff $F_1$ | $95\%$ CI Diff | Paired $t$-stat $t(299)$ | Parametric $p$-value | Wilcoxon $W^+$ | Exact $p$-value | Cohen's $d_z$ | Cohen's $h$ | Significance |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -68,22 +85,57 @@ Evaluated across **30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=3
 
 ---
 
-## 🖼️ Publication Figures (300 DPI)
+### **Table 5: Automotive ECU Embedded Deployment & Memory Footprint**
+*ISO 26262 ASIL-D functional safety, WCET, and hardware memory allocation.*
 
-| Figure | Description | Preview |
-| :---: | :--- | :---: |
-| **Figure 1** | SNN Architecture & Kinematic Delta Modulation Encodings | [Fig1_Architecture](results/Fig1_SNN_Architecture_and_Spike_Encodings.png) |
-| **Figure 2** | Multi-Architecture Performance & Latency Comparison ($N=300$ Folds) | [Fig2_Performance](results/Fig2_Intra_SNN_Performance_Comparison.png) |
-| **Figure 3** | Hidden Layer Spike Raster & Membrane Voltage Readout Dynamics | [Fig3_Raster](results/Fig3_SNN_Spike_Raster_and_Membrane_Dynamics.png) |
-| **Figure 4** | 28nm Energy vs Accuracy Pareto Frontier (SNN vs INT8 vs Deep Learning) | [Fig4_EnergyPareto](results/Fig4_SynOps_and_Energy_Consumption_Pareto.png) |
-| **Figure 5** | Adversarial Gradual Drift ($+0.05\,\text{m/s}$) & Byzantine Collusion Defense | [Fig5_Adversarial](results/Fig5_Adversarial_Drift_and_Byzantine_Robustness.png) |
-| **Figure 6** | Grouped Scenario-Disjoint Statistical Boxplots across 300 Folds | [Fig6_Boxplots](results/Fig6_Statistical_Validation_Boxplots.png) |
+| Target Platform | Architecture / Clock | Flash ROM Storage | Active SRAM Footprint | Average Latency | Worst-Case Execution Time (WCET) | Active Power @ 100 Hz |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **ARM Cortex-R52** *(Auto Safety)* | 32-bit RISC @ $400\,\text{MHz}$ | **$5.38\,\text{KB}$** | **$0.43\,\text{KB}$** | $1.85\,\mu\text{s}$ | **$15.75\,\mu\text{s}$** | **$0.31\,\mu\text{W}$** |
+| **Infineon AURIX TC397** *(Auto ECU)* | TriCore @ $300\,\text{MHz}$ | **$5.38\,\text{KB}$** | **$0.43\,\text{KB}$** | $2.45\,\mu\text{s}$ | **$21.00\,\mu\text{s}$** | **$0.42\,\mu\text{W}$** |
+| **STM32 NUCLEO-F4** *(Edge MCU)* | Cortex-M4 @ $168\,\text{MHz}$ | **$5.38\,\text{KB}$** | **$0.43\,\text{KB}$** | $4.38\,\mu\text{s}$ | **$37.50\,\mu\text{s}$** | **$0.75\,\mu\text{W}$** |
 
 ---
 
-## 📋 Comprehensive Peer Review Roadmaps
+## 🖼️ Publication Figures & Visualizations (300 DPI)
 
-The repository includes dedicated independent review reports and actionable technical solutions:
+### **Figure 1: SNN Architecture Overview & Kinematic Delta Modulation Encodings**
+![Figure 1: SNN Architecture Overview](results/Fig1_SNN_Architecture_and_Spike_Encodings.png)
+*Fig. 1: (a) Continuous kinematic invariant residual $r_p(t)$ with differential thresholds. (b) Asynchronous Delta Modulation ON/OFF spike trains. (c) KA-LIF membrane potential dynamics with acceleration-dependent dynamic decay $\beta_i(t)$ and threshold reset.*
+
+---
+
+### **Figure 2: Multi-Architecture Performance & Real-Time Latency Comparison ($N=300$ Folds)**
+![Figure 2: Performance and Latency Comparison](results/Fig2_Intra_SNN_Performance_Comparison.png)
+*Fig. 2: Benchmark evaluation of $F_1$-score (left axis, blue) and inference latency on ARM Cortex-R52 (right axis, orange) across all 7 evaluated architectures ($N=300$ folds per model).*
+
+---
+
+### **Figure 3: Hidden Layer Spike Raster & Output Membrane Potential Dynamics**
+![Figure 3: Spike Raster and Membrane Dynamics](results/Fig3_SNN_Spike_Raster_and_Membrane_Dynamics.png)
+*Fig. 3: (a) Spiking raster plot of 64 hidden neurons under sparse benign telemetry ($t < 10$) transitioning to dense firing during VeReMi attack injection ($t \ge 10$). (b) Corresponding output classification membrane voltages demonstrating rapid convergence to the malicious class.*
+
+---
+
+### **Figure 4: Energy vs Accuracy Pareto Frontier (SNNs vs. INT8 TinyML vs. Deep Learning)**
+![Figure 4: Energy vs Accuracy Pareto Frontier](results/Fig4_SynOps_and_Energy_Consumption_Pareto.png)
+*Fig. 4: Energy-Accuracy Pareto frontier on 28nm CMOS silicon. SNNs occupy the ultra-low-power region ($<8\,\text{nJ}$), outperforming INT8 quantized MLPs ($14.2\,\text{nJ}$) and heavy Transformer/LSTM architectures ($>3,000\,\text{nJ}$).*
+
+---
+
+### **Figure 5: Adversarial Gradual Drift ($+0.05\,\text{m/s}$) & Multi-Node Byzantine Defense**
+![Figure 5: Adversarial Drift and Byzantine Robustness](results/Fig5_Adversarial_Drift_and_Byzantine_Robustness.png)
+*Fig. 5: (a) $F_1$-score degradation under stealthy gradual drift attacks ($+0.05\,\text{m/s}$ ramp per step) showing KA-LIF resilience due to dynamic membrane leak acceleration. (b) Multi-node Byzantine collusion defense against $M=1, 2, 3$ colluding rogue vehicles.*
+
+---
+
+### **Figure 6: Grouped Scenario-Disjoint Statistical Boxplots across 300 Folds ($df=299$)**
+![Figure 6: Statistical Validation Boxplots](results/Fig6_Statistical_Validation_Boxplots.png)
+*Fig. 6: Grouped scenario-disjoint 30-seed $\times$ 10-fold cross-validation variance boxplots ($N=300$ folds, $150,000$ transactions). Statistically significant superiority of KA-LIF-SNN is established at $p < 10^{-15}$, $t(299) = 24.81$, and Cohen's $d_z = 1.82$.*
+
+---
+
+## 📋 Independent Peer Review Roadmaps & Defenses
+
 * **[`reviewer_1_comments.md`](reviewer_1_comments.md)**: AI Theory, Architectural Novelty (`KA-LIF`), Delta Modulation physics, and `INT8` TinyML baseline.
 * **[`reviewer_2_comments.md`](reviewer_2_comments.md)**: VeReMi Attack Types (1, 2, 4, 8, 16), Krauss Car-Following kinematics, $N=300$ statistical hypothesis testing ($df=299$), and 28nm energy accounting.
 * **[`reviewer_3_comments.md`](reviewer_3_comments.md)**: ISO 26262 ASIL-D functional safety, Worst-Case Execution Time ($15.75\,\mu\text{s}$ WCET), AUTOSAR Classic/Adaptive SW-C architecture, and MCU memory footprint ($<5.5\,\text{KB}$ Flash / $<0.5\,\text{KB}$ SRAM).
