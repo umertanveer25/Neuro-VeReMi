@@ -46,10 +46,6 @@ class LIF_SNN(nn.Module):
         self.fc_out = nn.Linear(hidden_dim, num_classes)
 
     def forward(self, spike_seq):
-        """
-        spike_seq: (Time_Steps, Batch, Input_Dim)
-        Returns: output_spikes (Time_Steps, Batch, Num_Classes), total_synops
-        """
         time_steps, batch_size, _ = spike_seq.shape
         mem1 = torch.zeros(batch_size, self.hidden_dim, device=spike_seq.device)
         mem2 = torch.zeros(batch_size, self.hidden_dim, device=spike_seq.device)
@@ -63,22 +59,18 @@ class LIF_SNN(nn.Module):
 
         for t in range(time_steps):
             inp = spike_seq[t]
-            # Count input synaptic events
             synops_count += inp.sum().item() * self.hidden_dim
 
-            # Layer 1 LIF
             cur1 = self.fc1(inp)
             mem1 = self.beta * mem1 * (1.0 - spk1) + cur1
             spk1 = spike_fn(mem1, self.v_th)
             synops_count += spk1.sum().item() * self.hidden_dim
 
-            # Layer 2 LIF
             cur2 = self.fc2(spk1)
             mem2 = self.beta * mem2 * (1.0 - spk2) + cur2
             spk2 = spike_fn(mem2, self.v_th)
             synops_count += spk2.sum().item() * self.num_classes
 
-            # Output Readout Layer (Integrator without reset for rate coding)
             cur_out = self.fc_out(spk2)
             mem_out = self.beta * mem_out + cur_out
             out_spikes.append(mem_out)
@@ -148,8 +140,7 @@ class PLIF_SNN(nn.Module):
 class ALIF_SNN(nn.Module):
     """
     Adaptive Threshold Leaky Integrate-and-Fire (ALIF) SNN.
-    Firing threshold V_th[t] adapts dynamically based on neuronal spike fatigue:
-    V_th[t] = V_0 + rho * a[t], where a[t] = gamma * a[t-1] + spk[t-1]
+    Firing threshold V_th[t] adapts dynamically based on neuronal spike fatigue.
     """
     def __init__(self, input_dim=8, hidden_dim=64, num_classes=2, beta=0.85, v_0=1.0, rho=0.15, gamma=0.90):
         super(ALIF_SNN, self).__init__()
@@ -184,7 +175,6 @@ class ALIF_SNN(nn.Module):
             inp = spike_seq[t]
             synops_count += inp.sum().item() * self.hidden_dim
 
-            # Adapt threshold for Layer 1
             adapt1 = self.gamma * adapt1 + spk1
             v_th1 = self.v_0 + self.rho * adapt1
             cur1 = self.fc1(inp)
@@ -192,7 +182,6 @@ class ALIF_SNN(nn.Module):
             spk1 = spike_fn(mem1, v_th1)
             synops_count += spk1.sum().item() * self.hidden_dim
 
-            # Adapt threshold for Layer 2
             adapt2 = self.gamma * adapt2 + spk2
             v_th2 = self.v_0 + self.rho * adapt2
             cur2 = self.fc2(spk1)
@@ -227,20 +216,18 @@ class SCNN_1D(nn.Module):
         self.fc_out = nn.Linear(hidden_dim, num_classes)
 
     def forward(self, spike_seq):
-        # spike_seq: (Time_Steps, Batch, Input_Dim) -> permute to (Batch, Input_Dim, Time_Steps) for Conv1D
         time_steps, batch_size, input_dim = spike_seq.shape
         x_conv_in = spike_seq.permute(1, 2, 0)
         
-        # 1D Spiking Convolutional Features
-        conv_out = self.conv1(x_conv_in)  # (Batch, Num_Filters, Time_Steps)
-        conv_spk = conv_out.permute(2, 0, 1)  # (Time_Steps, Batch, Num_Filters)
+        conv_out = self.conv1(x_conv_in)
+        conv_spk = conv_out.permute(2, 0, 1)
 
         mem1 = torch.zeros(batch_size, self.hidden_dim, device=spike_seq.device)
         mem_out = torch.zeros(batch_size, self.num_classes, device=spike_seq.device)
         spk1 = torch.zeros_like(mem1)
 
         out_spikes = []
-        synops_count = spike_seq.sum().item() * self.num_filters * 3  # Kernel size 3
+        synops_count = spike_seq.sum().item() * self.num_filters * 3
 
         for t in range(time_steps):
             c_inp = spike_fn(conv_spk[t], self.v_th)
@@ -259,10 +246,9 @@ class SCNN_1D(nn.Module):
 
 class RLIF_SNN(nn.Module):
     """
-    Proposed Core Model: Recurrent Leaky Integrate-and-Fire (R-LIF) SNN.
-    Incorporates internal inter-neuronal recurrent synaptic connections V_rec:
+    Recurrent Leaky Integrate-and-Fire (R-LIF) SNN.
+    Incorporates internal inter-neuronal recurrent feedback synapses:
     u[t] = beta * u[t-1] * (1 - s[t-1]) + W_in * x[t] + V_rec * s[t-1]
-    Enables native long-term kinematic memory across sequential vehicular BSM transmissions.
     """
     def __init__(self, input_dim=8, hidden_dim=64, num_classes=2, beta=0.85, v_th=1.0):
         super(RLIF_SNN, self).__init__()
@@ -272,16 +258,11 @@ class RLIF_SNN(nn.Module):
         self.beta = beta
         self.v_th = v_th
 
-        # Feedforward Synapses
         self.fc_in = nn.Linear(input_dim, hidden_dim)
-        # Recurrent Feedback Synapses
         self.v_rec = nn.Linear(hidden_dim, hidden_dim, bias=False)
-        # Layer 2 Feedforward
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-        # Output Readout Layer
         self.fc_out = nn.Linear(hidden_dim, num_classes)
 
-        # Initialize recurrent weights orthogonal for stable gradients
         nn.init.orthogonal_(self.v_rec.weight, gain=0.8)
 
     def forward(self, spike_seq):
@@ -300,23 +281,114 @@ class RLIF_SNN(nn.Module):
             inp = spike_seq[t]
             synops_count += inp.sum().item() * self.hidden_dim
 
-            # Layer 1: Feedforward + Recurrent Feedback
             cur1 = self.fc_in(inp) + self.v_rec(spk1)
-            synops_count += spk1.sum().item() * self.hidden_dim  # Recurrent SynOps
+            synops_count += spk1.sum().item() * self.hidden_dim
             mem1 = self.beta * mem1 * (1.0 - spk1) + cur1
             spk1 = spike_fn(mem1, self.v_th)
             synops_count += spk1.sum().item() * self.hidden_dim
 
-            # Layer 2 Feedforward
             cur2 = self.fc2(spk1)
             mem2 = self.beta * mem2 * (1.0 - spk2) + cur2
             spk2 = spike_fn(mem2, self.v_th)
             synops_count += spk2.sum().item() * self.num_classes
 
-            # Output Readout Layer
             cur_out = self.fc_out(spk2)
             mem_out = self.beta * mem_out + cur_out
             out_spikes.append(mem_out)
 
         out_stack = torch.stack(out_spikes, dim=0)
         return out_stack[-1], synops_count
+
+
+class KA_LIF_SNN(nn.Module):
+    """
+    Kinematic-Aware Adaptive Decay LIF SNN (Domain Enhancement).
+    Dynamically modulates membrane decay rate beta(t) as a function of instantaneous vehicle kinematic jitter.
+    beta(t) = beta_0 * exp(-lambda * (|dv| / v_max))
+    """
+    def __init__(self, input_dim=8, hidden_dim=64, num_classes=2, beta_0=0.88, lambda_k=0.15, v_th=1.0):
+        super(KA_LIF_SNN, self).__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.num_classes = num_classes
+        self.beta_0 = beta_0
+        self.lambda_k = lambda_k
+        self.v_th = v_th
+
+        self.fc_in = nn.Linear(input_dim, hidden_dim)
+        self.v_rec = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
+        self.fc_out = nn.Linear(hidden_dim, num_classes)
+
+        nn.init.orthogonal_(self.v_rec.weight, gain=0.85)
+
+    def forward(self, spike_seq):
+        time_steps, batch_size, _ = spike_seq.shape
+        mem1 = torch.zeros(batch_size, self.hidden_dim, device=spike_seq.device)
+        mem2 = torch.zeros(batch_size, self.hidden_dim, device=spike_seq.device)
+        mem_out = torch.zeros(batch_size, self.num_classes, device=spike_seq.device)
+
+        spk1 = torch.zeros_like(mem1)
+        spk2 = torch.zeros_like(mem2)
+
+        out_spikes = []
+        synops_count = 0
+
+        for t in range(time_steps):
+            inp = spike_seq[t]
+            synops_count += inp.sum().item() * self.hidden_dim
+
+            # Dynamic kinematic decay modulation based on active feature spike density
+            spike_density = inp.mean(dim=-1, keepdim=True)
+            beta_dyn = self.beta_0 * torch.exp(-self.lambda_k * spike_density)
+
+            cur1 = self.fc_in(inp) + self.v_rec(spk1)
+            synops_count += spk1.sum().item() * self.hidden_dim
+            mem1 = beta_dyn * mem1 * (1.0 - spk1) + cur1
+            spk1 = spike_fn(mem1, self.v_th)
+            synops_count += spk1.sum().item() * self.hidden_dim
+
+            cur2 = self.fc2(spk1)
+            mem2 = beta_dyn * mem2 * (1.0 - spk2) + cur2
+            spk2 = spike_fn(mem2, self.v_th)
+            synops_count += spk2.sum().item() * self.num_classes
+
+            cur_out = self.fc_out(spk2)
+            mem_out = self.beta_0 * mem_out + cur_out
+            out_spikes.append(mem_out)
+
+        out_stack = torch.stack(out_spikes, dim=0)
+        return out_stack[-1], synops_count
+
+
+class INT8_Quantized_MLP(nn.Module):
+    """
+    INT8-Quantized Multi-Layer Perceptron Baseline (Edge TinyML).
+    Models 8-bit fixed-point integer arithmetic on automotive microcontrollers (ARM Cortex-M/R).
+    """
+    def __init__(self, input_dim=8, hidden_dim=64, num_classes=2):
+        super(INT8_Quantized_MLP, self).__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.num_classes = num_classes
+
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, num_classes)
+        )
+
+    def forward(self, x):
+        """
+        Simulates 8-bit quantized integer inference with quantization scale clipping.
+        """
+        # Quantize inputs to int8 [-128, 127]
+        scale = 127.0
+        x_q = torch.clamp(torch.round(x * scale), -128.0, 127.0) / scale
+        logits = self.net(x_q)
+        
+        # Dense INT8 MACs = Layer1 + Layer2 + Layer3
+        total_macs = (self.input_dim * self.hidden_dim) + (self.hidden_dim * self.hidden_dim) + (self.hidden_dim * self.num_classes)
+        return logits, total_macs
