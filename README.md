@@ -25,36 +25,15 @@
 
 ## 🛡️ 3. Multi-Layer Threat Model & VeReMi Attack Defense Taxonomy
 
-![Figure: Multi-Layer Threat Model & VeReMi Attack Defense Taxonomy](results/Fig_VeReMi_Threat_Model_Taxonomy.png)
-*Multi-layer V2X threat model and neuromorphic attack defense taxonomy. Ingested 5.9 GHz DSRC/C-V2X BSM telemetry subject to Spatial Domain (Types 1 & 2), Velocity Domain (Types 4 & 8), and Temporal/Collusion Domain (Type 16 & Byzantine Sybil rings) attacks are processed through the 3-layer Neuromorphic Defense Stack (Delta-Rate Spike Encoding, Kinematic-Aware KA-LIF SNN, and Multi-Hop Byzantine Trust Accumulator $H_i$) to isolate adversarial anomalies in $< 0.28\,\text{ms}$ under ISO 26262 ASIL-D functional safety constraints.*
+![Figure 3: Multi-Layer Threat Model & VeReMi Attack Defense Taxonomy](results/Fig3_VeReMi_Threat_Model_Taxonomy.png)
+*Fig. 3: Multi-layer V2X threat model and neuromorphic attack defense taxonomy. Ingested 5.9 GHz DSRC/C-V2X BSM telemetry subject to Spatial Domain (Types 1 & 2), Velocity Domain (Types 4 & 8), and Temporal/Collusion Domain (Type 16 & Byzantine Sybil rings) attacks are processed through the 3-layer Neuromorphic Defense Stack (Delta-Rate Spike Encoding, Kinematic-Aware KA-LIF SNN, and Multi-Hop Byzantine Trust Accumulator $H_i$) to isolate adversarial anomalies in $< 0.28\,\text{ms}$ under ISO 26262 ASIL-D functional safety constraints.*
 
 ---
 
 ## ⚙️ 4. Automotive AUTOSAR & ISO 26262 ASIL-D Embedded Deployment
 
-```mermaid
-flowchart TD
-    subgraph ECU["Automotive Electronic Control Unit (ARM Cortex-R52 / Infineon AURIX TC397)"]
-        subgraph AUTOSAR["AUTOSAR Adaptive / Classic Software Stack"]
-            VFB["Virtual Functional Bus (VFB)"] --> SWC["Neuro-VeReMi Sensor-Actuator SW-C\n(Periodic 100 Hz Runnable)"]
-            
-            subgraph Memory["Static Memory Pre-Allocation (MISRA-C:2012)"]
-                ROM["Flash ROM: 5.38 KB\n(Weights & Biases in INT8/FP16)"]
-                RAM["Active SRAM: 0.43 KB\n(Membrane States & Spike Buffers)"]
-            end
-            
-            SWC --> Safety["ISO 26262 ASIL-D Safety Monitor\n(WCET Upper-Bound: 15.75 µs | 634x Safety Margin)"]
-        end
-        
-        Safety --> Fallback["Kalman Dead-Reckoning Safe-State Fallback\n(Triggered if Packet Drop > 20%)"]
-        Safety --> Actuate["ADAS Braking & Steering Actuator\n(Trust-Gated Zero-Trust Path)"]
-    end
-
-    style ECU fill:#f7fafc,stroke:#4a5568,stroke-width:2px;
-    style AUTOSAR fill:#edf2f7,stroke:#2b6cb0,stroke-width:2px;
-    style Memory fill:#feebc8,stroke:#d69e2e,stroke-width:2px;
-    style Safety fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
-```
+![Figure 4: Automotive AUTOSAR & ISO 26262 ASIL-D Embedded Deployment](results/Fig4_AUTOSAR_ASIL_D_Deployment.png)
+*Fig. 4: Automotive Electronic Control Unit (ECU) deployment architecture across ARM Cortex-R52 and Infineon AURIX TC397: (Left) AUTOSAR Classic/Adaptive Software Component (SW-C) running as a 100 Hz runnable with zero-malloc MISRA-C:2012 static memory allocation (5.38 KB Flash ROM, 0.43 KB SRAM); (Middle) ISO 26262 ASIL-D Real-Time Safety Engine guaranteeing an execution time of $1.85\,\mu\text{s}$ ($15.75\,\mu\text{s}$ WCET, $634\times$ safety margin); (Right) Dual-path actuation isolating anomalies and triggering Kalman dead-reckoning fallback if packet loss $> 20\%$.*
 
 ---
 
@@ -125,53 +104,41 @@ flowchart TD
 
 ---
 
-## 🖼️ 6. High-Resolution Publication Figures (300 DPI)
+## 🖼️ 6. Empirical Validation & Experimental Figures (300 DPI)
 
-### **Figure 1: End-to-End System Architecture & Pipeline**
-![Figure 1: System Architecture](results/Fig1_System_Architecture_Pipeline.png)
-*Fig. 1: Complete 4-stage dataflow pipeline: V2X Ingestion (100 Hz) $\rightarrow$ Delta-Modulation Spike Encoding $\rightarrow$ 3-Layer KA-LIF Spiking Network $\rightarrow$ Zero-Trust ECU Actuation ($<1.85\,\mu\text{s}$, $3.12\,\text{nJ}$).*
-
----
-
-### **Figure 2: KA-LIF Neuronal Dynamics Circuit Schematic**
-![Figure 2: KA-LIF Neuronal Dynamics](results/Fig2_KALIF_Neuronal_Dynamics.png)
-*Fig. 2: Biophysical-to-computational signal flow of KA-LIF: Presynaptic spikes $s_j(t)$ integrate through weights $W$ while the Kinematic Stress Estimator $\zeta_{\text{kin}}(t)$ accelerates dynamic decay $\beta_i(t) = \beta_0 \exp(-\lambda_k \zeta_{\text{kin}})$.*
+### **Figure 5: Kinematic Delta Modulation Encodings & Voltage Reset**
+![Figure 5: Delta Modulation & Voltage Reset](results/Fig5_Spike_Encoding_and_Voltage_Reset.png)
+*Fig. 5: (a) Continuous kinematic invariant residual $r_p(t)$ with differential bounds $\pm\theta$. (b) Asynchronous Delta Modulation ON/OFF spike trains. (c) KA-LIF membrane potential dynamics with threshold firing ($V_{\text{th}} = 0.75\,\text{V}$) and instant hard reset to $0.0\,\text{V}$.*
 
 ---
 
-### **Figure 3: Kinematic Delta Modulation Encodings & Voltage Reset**
-![Figure 3: Delta Modulation & Voltage Reset](results/Fig3_Spike_Encoding_and_Voltage_Reset.png)
-*Fig. 3: (a) Continuous kinematic invariant residual $r_p(t)$ with differential bounds $\pm\theta$. (b) Asynchronous Delta Modulation ON/OFF spike trains. (c) KA-LIF membrane potential dynamics with threshold firing ($V_{\text{th}} = 0.75\,\text{V}$) and instant hard reset to $0.0\,\text{V}$.*
+### **Figure 6: Multi-Architecture Performance & Real-Time Latency Comparison ($N=300$ Folds)**
+![Figure 6: Performance and Latency Comparison](results/Fig6_Multi_Model_Performance_and_Latency.png)
+*Fig. 6: Benchmark evaluation of $F_1$-score (left axis, blue) and inference latency on ARM Cortex-R52 (right axis, orange) across all 7 evaluated architectures ($N=300$ folds per model).*
 
 ---
 
-### **Figure 4: Multi-Architecture Performance & Real-Time Latency Comparison ($N=300$ Folds)**
-![Figure 4: Performance and Latency Comparison](results/Fig4_Multi_Model_Performance_and_Latency.png)
-*Fig. 4: Benchmark evaluation of $F_1$-score (left axis, blue) and inference latency on ARM Cortex-R52 (right axis, orange) across all 7 evaluated architectures ($N=300$ folds per model).*
+### **Figure 7: Hidden Layer Spike Raster & Output Membrane Potential Dynamics**
+![Figure 7: Spike Raster and Membrane Dynamics](results/Fig7_Spike_Raster_and_Membrane_Dynamics.png)
+*Fig. 7: (a) Spiking raster plot of 64 hidden neurons under sparse benign telemetry ($t < 10$) transitioning to dense firing during VeReMi attack injection ($t \ge 10$). (b) Corresponding output classification membrane voltages demonstrating rapid convergence to the malicious class.*
 
 ---
 
-### **Figure 5: Hidden Layer Spike Raster & Output Membrane Potential Dynamics**
-![Figure 5: Spike Raster and Membrane Dynamics](results/Fig5_Spike_Raster_and_Membrane_Dynamics.png)
-*Fig. 5: (a) Spiking raster plot of 64 hidden neurons under sparse benign telemetry ($t < 10$) transitioning to dense firing during VeReMi attack injection ($t \ge 10$). (b) Corresponding output classification membrane voltages demonstrating rapid convergence to the malicious class.*
+### **Figure 8: Energy vs Accuracy Pareto Frontier (SNNs vs. INT8 TinyML vs. Deep Learning)**
+![Figure 8: Energy vs Accuracy Pareto Frontier](results/Fig8_Energy_Accuracy_Pareto_Frontier.png)
+*Fig. 8: Energy-Accuracy Pareto frontier on 28nm CMOS silicon. SNNs occupy the ultra-low-power region ($<8\,\text{nJ}$), outperforming INT8 quantized MLPs ($14.2\,\text{nJ}$) and heavy Transformer/LSTM architectures ($>3,000\,\text{nJ}$).*
 
 ---
 
-### **Figure 6: Energy vs Accuracy Pareto Frontier (SNNs vs. INT8 TinyML vs. Deep Learning)**
-![Figure 6: Energy vs Accuracy Pareto Frontier](results/Fig6_Energy_Accuracy_Pareto_Frontier.png)
-*Fig. 6: Energy-Accuracy Pareto frontier on 28nm CMOS silicon. SNNs occupy the ultra-low-power region ($<8\,\text{nJ}$), outperforming INT8 quantized MLPs ($14.2\,\text{nJ}$) and heavy Transformer/LSTM architectures ($>3,000\,\text{nJ}$).*
+### **Figure 9: Adversarial Gradual Drift ($+0.05\,\text{m/s}$) & Multi-Node Byzantine Defense**
+![Figure 9: Adversarial Drift and Byzantine Robustness](results/Fig9_Adversarial_Drift_and_Byzantine_Defense.png)
+*Fig. 9: (a) $F_1$-score degradation under stealthy gradual drift attacks ($+0.05\,\text{m/s}$ ramp per step) showing KA-LIF resilience due to dynamic membrane leak acceleration. (b) Multi-node Byzantine collusion defense against $M=1, 2, 3$ colluding rogue vehicles.*
 
 ---
 
-### **Figure 7: Adversarial Gradual Drift ($+0.05\,\text{m/s}$) & Multi-Node Byzantine Defense**
-![Figure 7: Adversarial Drift and Byzantine Robustness](results/Fig7_Adversarial_Drift_and_Byzantine_Defense.png)
-*Fig. 7: (a) $F_1$-score degradation under stealthy gradual drift attacks ($+0.05\,\text{m/s}$ ramp per step) showing KA-LIF resilience due to dynamic membrane leak acceleration. (b) Multi-node Byzantine collusion defense against $M=1, 2, 3$ colluding rogue vehicles.*
-
----
-
-### **Figure 8: Grouped Scenario-Disjoint Statistical Boxplots across 300 Folds ($df=299$)**
-![Figure 8: Statistical Validation Boxplots](results/Fig8_Statistical_Validation_Boxplots.png)
-*Fig. 8: Grouped scenario-disjoint 30-seed $\times$ 10-fold cross-validation variance boxplots ($N=300$ folds, $150,000$ transactions). Statistically significant superiority of KA-LIF-SNN is established at $p < 10^{-15}$, $t(299) = 24.81$, and Cohen's $d_z = 1.82$.*
+### **Figure 10: Grouped Scenario-Disjoint Statistical Boxplots across 300 Folds ($df=299$)**
+![Figure 10: Statistical Validation Boxplots](results/Fig10_Statistical_Validation_Boxplots.png)
+*Fig. 10: Grouped scenario-disjoint 30-seed $\times$ 10-fold cross-validation variance boxplots ($N=300$ folds, $150,000$ transactions). Statistically significant superiority of KA-LIF-SNN is established at $p < 10^{-15}$, $t(299) = 24.81$, and Cohen's $d_z = 1.82$.*
 
 ---
 
@@ -197,7 +164,7 @@ Neuro-VeReMi/
 │   ├── run_parallel_30seed_benchmark.py  # 16-core parallel 30-seed 10-fold CV orchestrator
 │   ├── generate_publication_figures.py   # Publication-quality 300 DPI figures generator
 │   └── plot_fig1_exact_300dpi.py         # Standalone exact vector generator for Fig 3
-├── results/                      # Standardized publication figures (Fig 1 to Fig 8), CSVs, JSON
+├── results/                      # Standardized publication figures (Fig 1 to Fig 10), CSVs, JSON
 ├── reviewer_1_comments.md        # Reviewer 1 (Novelty & Contribution) Assessment
 ├── reviewer_2_comments.md        # Reviewer 2 (Physics & Methodology) Assessment
 ├── reviewer_3_comments.md        # Reviewer 3 (Automotive Safety & Systems) Assessment
