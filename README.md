@@ -45,6 +45,9 @@ flowchart LR
 
 ## 🔬 2. Neuronal Dynamics: Kinematic-Aware Adaptive Decay (`KA-LIF`)
 
+![KA-LIF Neuronal Dynamics Circuit Schematic](results/Fig_KALIF_Neuronal_Dynamics.png)
+*Fig. 2A: Detailed circuit schematic and computational signal flow of the proposed Kinematic-Aware Adaptive Decay Leaky Integrate-and-Fire (KA-LIF) model. Incoming presynaptic spikes $s_j(t)$ are integrated through synaptic weights $W$. Simultaneously, the Kinematic Stress Estimator evaluates Newtonian velocity deviations $|\Delta v_i(t)|$ and jerk invariants $|\Delta a_i(t)|$ to dynamically accelerate the membrane leak rate $\beta_i(t) = \beta_0 \exp(-\lambda_k \zeta_{\text{kin}}(t))$. The threshold comparator ($V_{\text{th}} = 0.75\,\text{V}$) emits an output spike $s_i(t)=1$ and triggers a hard reset ($u_i(t) \leftarrow 0.0\,\text{V}$) with a refractory guard period $\tau_{\text{ref}}$.*
+
 ```mermaid
 stateDiagram-v2
     [*] --> SubThreshold_Integration : Incoming Spike Train s_in(t)
