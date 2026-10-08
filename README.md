@@ -9,27 +9,131 @@
 
 ---
 
-## 📌 Executive Summary & Architecture
+## 📌 1. System Architecture & End-to-End Pipeline Diagram
 
-Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messages (CAMs) over Basic Safety Messages (BSMs) are acutely vulnerable to cyber-physical spoofing, phantom braking, and multi-node Byzantine collusion attacks. Traditional Deep Learning (DL) models require power-hungry floating-point multiply-accumulate (MAC) units and introduce latency bottlenecks incompatible with real-time automotive control loops ($<10\,\text{ms}$).
+```mermaid
+flowchart LR
+    subgraph S1["1. V2X Telemetry Ingestion (100 Hz)"]
+        A1["Cooperative Awareness (CAM) / BSM"] --> A2["Newtonian Invariant Extractor\n(rp, rv, ra, Heading)"]
+        A3["DSRC / C-V2X Radio Receiver"] --> A4["Multipath Rayleigh & Doppler Filter\n(Pr ∝ d^-α · |CN(0,1)|^2)"]
+    end
 
-**Neuro-VeReMi** introduces a novel **Kinematic-Aware Spiking Neural Network (`KA-LIF-SNN`)** that unifies Newtonian vehicular physics, event-driven temporal spike encoders, and hardware-efficient neuromorphic computing for vehicular edge microcontrollers.
+    subgraph S2["2. Neuromorphic Event Encoding"]
+        A2 & A4 --> B1["Dual Delta-Modulation Thresholds\n(+θ / -θ Derivative Filter)"]
+        B1 --> B2["Asynchronous Spike Streams\n(ON/OFF Spikes: s_in(t) ∈ {-1, 0, +1}^16)"]
+    end
+
+    subgraph S3["3. Kinematic-Aware Spiking Core (KA-LIF)"]
+        B2 --> C1["Layer 1: 64 KA-LIF Neurons\n(Dynamic Decay: β(t) = β_0 · exp(-λ ζ_kin))"]
+        C1 --> C2["Layer 2: 64 Recurrent Neurons\n(Recurrent Feedback: W_rec · s(t-1))"]
+        C2 --> C3["Layer 3: 2 Readout Neurons\n(Membrane Potential Integrator)"]
+    end
+
+    subgraph S4["4. Zero-Trust Verdict & ECU Actuation"]
+        C3 --> D1["Dynamic Multi-Hop Trust Engine\n(Trust Accumulator H_i(t))"]
+        D1 --> D2["Zero-Trust Verdict\n(Benign vs. Adversarial Anomaly)"]
+        D2 --> D3["AUTOSAR SW-C Interface\n(<1.85 µs Latency | ISO 26262 ASIL-D)"]
+    end
+
+    style S1 fill:#f0f4f8,stroke:#2b6cb0,stroke-width:2px;
+    style S2 fill:#edf2f7,stroke:#4a5568,stroke-width:2px;
+    style S3 fill:#e6fffa,stroke:#319795,stroke-width:2px;
+    style S4 fill:#feebc8,stroke:#dd6b20,stroke-width:2px;
+```
 
 ---
 
-## 🔬 Core Scientific & Engineering Contributions
+## 🔬 2. Neuronal Dynamics: Kinematic-Aware Adaptive Decay (`KA-LIF`)
 
-1. **Kinematic-Aware Adaptive Decay LIF (`KA-LIF-SNN`):** Dynamically modulates neuronal membrane decay $\beta_i(t)$ as a function of instantaneous Newtonian acceleration and jerk invariants:
-   $$\beta_i(t) = \beta_0 \cdot \exp\left(-\lambda_k \cdot \zeta_{\text{kin}}(t)\right), \quad \text{where } \zeta_{\text{kin}}(t) = \frac{|\Delta v_i(t)|}{\bar{v}_{\text{ref}}} + \frac{|\Delta a_i(t)|}{a_{\max}}$$
-2. **Authentic VeReMi Kinematic Physics & Trace Parser:** Grounded in Krauss car-following dynamics, multi-path Rayleigh fading ($P_r \propto d^{-\alpha} \cdot |\mathcal{CN}(0,1)|^2$), Doppler shifts, and all 5 official VeReMi attack vectors (Type 1 Constant Pos, Type 2 Random Pos, Type 4 Constant Spd, Type 8 Random Spd, Type 16 Eventual Stop).
-3. **8-bit TinyML Fixed-Point Edge Baseline (`INT8_Quantized_MLP`):** Implemented an authentic post-training quantized 8-bit baseline with exact integer MAC tracking for automotive microcontrollers.
-4. **End-to-End 28nm Silicon Energy Breakdown:** Formulates full energy accounting:
-   $$E_{\text{total}} = E_{\text{encode}} (0.15\,\text{pJ/bit}) + E_{\text{SynOps}} (0.9\,\text{pJ/SynOp}) + E_{\text{leakage}} (130\,\text{pJ/step})$$
-5. **ISO 26262 ASIL-D Functional Safety & WCET Upper Bound:** Proven worst-case execution time ($15.75\,\mu\text{s}$ at $100\%$ spike storms) with static memory pre-allocation ($<5.5\,\text{KB}$ Flash ROM, $<0.5\,\text{KB}$ SRAM).
+```mermaid
+stateDiagram-v2
+    [*] --> SubThreshold_Integration : Incoming Spike Train s_in(t)
+    
+    state SubThreshold_Integration {
+        [*] --> Compute_Kinematic_Stress
+        Compute_Kinematic_Stress --> Modulate_Decay_Rate : ζ_kin(t) = |Δv|/v_ref + |Δa|/a_max
+        Modulate_Decay_Rate --> Leak_Membrane_Potential : β_i(t) = β_0 · exp(-λ_k · ζ_kin(t))
+        Leak_Membrane_Potential --> Synaptic_Accumulation : u_i(t) = β_i(t)·u_i(t-1) + W·s(t)
+    }
+
+    SubThreshold_Integration --> Threshold_Check : u_i(t) evaluated
+    
+    state Threshold_Check <<choice>>
+    Threshold_Check --> Fire_Spike : u_i(t) >= V_th (0.75 V)
+    Threshold_Check --> SubThreshold_Integration : u_i(t) < V_th
+
+    state Fire_Spike {
+        [*] --> Emit_Output_Spike : s_out(t) = 1
+        Emit_Output_Spike --> Hard_Reset_Membrane : u_i(t) = 0.0 V
+        Hard_Reset_Membrane --> Refractory_Period : τ_ref = 1 time-step
+    }
+
+    Fire_Spike --> SubThreshold_Integration : Next time-step (t + 1)
+```
 
 ---
 
-## 📊 Complete Experimental Results & Tables
+## 🛡️ 3. Multi-Layer Threat Model & VeReMi Attack Defense Taxonomy
+
+```mermaid
+graph TD
+    Root["VeReMi Attack Taxonomy & Neuromorphic Defenses"] --> A["Spatial-Domain Spoofing"]
+    Root --> B["Velocity-Domain Manipulation"]
+    Root --> C["Temporal & Coordinated Collusion"]
+
+    A --> A1["Type 1: Constant Position\n(Static Ghost Vehicle Coordinates)"]
+    A --> A2["Type 2: Random Position\n(Spatial Coordinate Jitter & Hopping)"]
+    
+    B --> B1["Type 4: Constant Speed\n(Fixed Speed Invariant Bypass)"]
+    B --> B2["Type 8: Random Speed\n(Phantom Braking & Traffic Shockwaves)"]
+    
+    C --> C1["Type 16: Eventual Stop\n(Gradual Speed Decay Evasion)"]
+    C --> C2["Multi-Node Byzantine\n(M=1,2,3 Colluding Sybil Attackers)"]
+
+    A1 & A2 --> D1["Delta-Modulation Derivative Filter\n(Detects Δrp Newtonian Discontinuities)"]
+    B1 & B2 --> D2["KA-LIF Dynamic Decay Acceleration\n(Membrane Leaks Out on High Velocity Jitter)"]
+    C1 & C2 --> D3["Recurrent Synapses & Trust Accumulator\n(Multi-Hop Memory H_i Identifies Slow Drift)"]
+
+    style Root fill:#2d3748,color:#fff,stroke:#1a202c,stroke-width:2px;
+    style A fill:#ebf8ff,stroke:#3182ce,stroke-width:2px;
+    style B fill:#feebc8,stroke:#dd6b20,stroke-width:2px;
+    style C fill:#fed7d7,stroke:#e53e3e,stroke-width:2px;
+    style D1 fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
+    style D2 fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
+    style D3 fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
+```
+
+---
+
+## ⚙️ 4. Automotive AUTOSAR & ISO 26262 ASIL-D Embedded Deployment
+
+```mermaid
+flowchart TD
+    subgraph ECU["Automotive Electronic Control Unit (ARM Cortex-R52 / Infineon AURIX TC397)"]
+        subgraph AUTOSAR["AUTOSAR Adaptive / Classic Software Stack"]
+            VFB["Virtual Functional Bus (VFB)"] --> SWC["Neuro-VeReMi Sensor-Actuator SW-C\n(Periodic 100 Hz Runnable)"]
+            
+            subgraph Memory["Static Memory Pre-Allocation (MISRA-C:2012)"]
+                ROM["Flash ROM: 5.38 KB\n(Weights & Biases in INT8/FP16)"]
+                RAM["Active SRAM: 0.43 KB\n(Membrane States & Spike Buffers)"]
+            end
+            
+            SWC --> Safety["ISO 26262 ASIL-D Safety Monitor\n(WCET Upper-Bound: 15.75 µs | 634x Safety Margin)"]
+        end
+        
+        Safety --> Fallback["Kalman Dead-Reckoning Safe-State Fallback\n(Triggered if Packet Drop > 20%)"]
+        Safety --> Actuate["ADAS Braking & Steering Actuator\n(Trust-Gated Zero-Trust Path)"]
+    end
+
+    style ECU fill:#f7fafc,stroke:#4a5568,stroke-width:2px;
+    style AUTOSAR fill:#edf2f7,stroke:#2b6cb0,stroke-width:2px;
+    style Memory fill:#feebc8,stroke:#d69e2e,stroke-width:2px;
+    style Safety fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
+```
+
+---
+
+## 📊 5. Complete Experimental Results & Benchmark Tables
 
 ### **Table 1: Comprehensive 300-Fold Cross-Validation Benchmark ($N=2,100$ Evaluations)**
 *Evaluated across 30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=300$ independent folds per model) on authentic VeReMi kinematic traces.*
@@ -96,7 +200,7 @@ Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messag
 
 ---
 
-## 🖼️ Publication Figures & Visualizations (300 DPI)
+## 🖼️ 6. High-Resolution Publication Figures (300 DPI)
 
 ### **Figure 1: SNN Architecture Overview & Kinematic Delta Modulation Encodings**
 ![Figure 1: SNN Architecture Overview](results/Fig1_SNN_Architecture_and_Spike_Encodings.png)
@@ -134,7 +238,7 @@ Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messag
 
 ---
 
-## 📋 Independent Peer Review Roadmaps & Defenses
+## 📋 7. Independent Peer Review Roadmaps & Defenses
 
 * **[`reviewer_1_comments.md`](reviewer_1_comments.md)**: AI Theory, Architectural Novelty (`KA-LIF`), Delta Modulation physics, and `INT8` TinyML baseline.
 * **[`reviewer_2_comments.md`](reviewer_2_comments.md)**: VeReMi Attack Types (1, 2, 4, 8, 16), Krauss Car-Following kinematics, $N=300$ statistical hypothesis testing ($df=299$), and 28nm energy accounting.
@@ -142,7 +246,7 @@ Connected and Autonomous Vehicles (CAVs) relying on Cooperative Awareness Messag
 
 ---
 
-## 📂 Repository Structure
+## 📂 8. Repository File Structure
 
 ```tree
 Neuro-VeReMi/
@@ -165,7 +269,7 @@ Neuro-VeReMi/
 
 ---
 
-## 🛠️ Quickstart Installation & Reproduction
+## 🛠️ 9. Quickstart Installation & Reproduction
 
 ### 1. Clone & Environment Setup
 ```bash
