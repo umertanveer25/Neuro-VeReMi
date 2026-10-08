@@ -11,6 +11,9 @@
 
 ## 📌 1. System Architecture & End-to-End Pipeline Diagram
 
+![System Architecture & End-to-End Pipeline](results/Fig_System_Architecture_Pipeline.png)
+*Fig. 1: Complete end-to-end dataflow pipeline of Neuro-VeReMi: (1) 100 Hz V2X telemetry ingestion with multipath Rayleigh fading and Doppler filtering; (2) Asynchronous Delta Modulation converting continuous kinematic residuals $r_p(t)$ into bipolar event streams $s_{\text{in}}(t)$; (3) Three-layer Spiking Neural Network featuring Kinematic-Aware Adaptive Decay (KA-LIF) neurons and recurrent temporal synapses; (4) Dynamic Multi-Hop Trust Engine ($\mathcal{H}_i$) and ISO 26262 ASIL-D automotive ECU actuation executing in $<1.85\,\mu\text{s}$ with $3.12\,\text{nJ}$ energy consumption.*
+
 ```mermaid
 flowchart LR
     subgraph S1["1. V2X Telemetry Ingestion (100 Hz)"]
