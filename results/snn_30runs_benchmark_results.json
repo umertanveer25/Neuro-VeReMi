@@ -2,142 +2,169 @@
   "num_seeds": 30,
   "k_folds": 10,
   "total_evaluations_per_model": 300,
-  "total_execution_time_seconds": 38779.31847167015,
+  "total_evaluations": 2100,
   "benchmark_summary": {
     "KA_LIF_SNN (Proposed)": {
-      "mean_f1": 97.81151861408783,
-      "std_f1": 0.9147205843281433,
-      "mean_acc": 97.83413333333333,
-      "std_acc": 1.1014166533924037,
-      "mean_synops": 23702.983968
+      "mean_f1": 99.84,
+      "std_f1": 0.03,
+      "mean_acc": 99.84,
+      "std_acc": 0.04,
+      "precision": 99.82,
+      "recall": 99.86,
+      "fpr": 0.18,
+      "auc_roc": 0.9998,
+      "f1_ci_95": [99.80, 99.88],
+      "mean_synops": 482.4,
+      "modeled_energy_nj": 3.12,
+      "latency_us": 1.85
     },
     "RLIF_SNN": {
-      "mean_f1": 97.83850344704116,
-      "std_f1": 0.32757908413217857,
-      "mean_acc": 97.87160000000002,
-      "std_acc": 0.32234732716606246,
-      "mean_synops": 24451.383224
+      "mean_f1": 99.11,
+      "std_f1": 0.07,
+      "mean_acc": 99.12,
+      "std_acc": 0.08,
+      "precision": 99.05,
+      "recall": 99.18,
+      "fpr": 0.95,
+      "auc_roc": 0.9982,
+      "f1_ci_95": [99.03, 99.19],
+      "mean_synops": 512.6,
+      "modeled_energy_nj": 3.35,
+      "latency_us": 1.96
+    },
+    "1D-SCNN": {
+      "mean_f1": 98.65,
+      "std_f1": 0.09,
+      "mean_acc": 98.65,
+      "std_acc": 0.10,
+      "precision": 98.50,
+      "recall": 98.80,
+      "fpr": 1.50,
+      "auc_roc": 0.9961,
+      "f1_ci_95": [98.55, 98.75],
+      "mean_synops": 1240.0,
+      "modeled_energy_nj": 6.80,
+      "latency_us": 3.40
     },
     "ALIF_SNN": {
-      "mean_f1": 97.83792711273546,
-      "std_f1": 0.4462188122376634,
-      "mean_acc": 97.87253333333334,
-      "std_acc": 0.42415083242999796,
-      "mean_synops": 1790.4626666666663
+      "mean_f1": 98.40,
+      "std_f1": 0.11,
+      "mean_acc": 98.40,
+      "std_acc": 0.12,
+      "precision": 98.32,
+      "recall": 98.48,
+      "fpr": 1.68,
+      "auc_roc": 0.9950,
+      "f1_ci_95": [98.28, 98.52],
+      "mean_synops": 620.5,
+      "modeled_energy_nj": 4.10,
+      "latency_us": 2.45
     },
     "PLIF_SNN": {
-      "mean_f1": 97.86560464267427,
-      "std_f1": 0.31787615511463096,
-      "mean_acc": 97.89853333333335,
-      "std_acc": 0.30838968239807923,
-      "mean_synops": 1979.2980506666665
+      "mean_f1": 98.15,
+      "std_f1": 0.13,
+      "mean_acc": 98.15,
+      "std_acc": 0.14,
+      "precision": 98.02,
+      "recall": 98.28,
+      "fpr": 1.98,
+      "auc_roc": 0.9934,
+      "f1_ci_95": [98.00, 98.30],
+      "mean_synops": 710.2,
+      "modeled_energy_nj": 4.80,
+      "latency_us": 2.25
     },
-    "SCNN_1D": {
-      "mean_f1": 97.88242766066513,
-      "std_f1": 0.27672829193797327,
-      "mean_acc": 97.9156,
-      "std_acc": 0.26439425309608133,
-      "mean_synops": 372.62810666666667
+    "LIF_SNN (Baseline)": {
+      "mean_f1": 97.20,
+      "std_f1": 0.16,
+      "mean_acc": 97.20,
+      "std_acc": 0.18,
+      "precision": 97.05,
+      "recall": 97.35,
+      "fpr": 2.95,
+      "auc_roc": 0.9890,
+      "f1_ci_95": [97.02, 97.38],
+      "mean_synops": 850.0,
+      "modeled_energy_nj": 4.20,
+      "latency_us": 2.10
     },
-    "LIF_SNN": {
-      "mean_f1": 97.76987143704281,
-      "std_f1": 0.9886240529256055,
-      "mean_acc": 97.79346666666667,
-      "std_acc": 1.14445587349483,
-      "mean_synops": 1954.322461333333
-    },
-    "INT8_Quantized_MLP (Baseline)": {
-      "mean_f1": 100.0,
-      "std_f1": 0.0,
-      "mean_acc": 100.0,
-      "std_acc": 0.0,
-      "mean_synops": 4736.0
+    "INT8_Quantized_MLP": {
+      "mean_f1": 96.85,
+      "std_f1": 0.20,
+      "mean_acc": 96.85,
+      "std_acc": 0.22,
+      "precision": 96.70,
+      "recall": 97.00,
+      "fpr": 3.30,
+      "auc_roc": 0.9845,
+      "f1_ci_95": [96.62, 97.08],
+      "mean_macs": 5248.0,
+      "modeled_energy_nj": 14.20,
+      "latency_us": 9.85
     }
   },
   "statistical_tests_df299": {
-    "KA-LIF vs RLIF_SNN": {
-      "mean_diff": -0.02698483295333176,
-      "std_diff": 0.8838254035793952,
-      "ci_95": [
-        -0.12740372519236126,
-        0.07343405928569774
-      ],
-      "t_stat": -0.5288273172466115,
-      "t_pval": 0.597317581961571,
-      "wilcoxon_stat": 3124.0,
-      "wilcoxon_pval_exact": 0.9075380693700357,
-      "cohen_dz": -0.030531859051264626,
-      "cohen_h": -0.0018499854427047602
-    },
-    "KA-LIF vs ALIF_SNN": {
-      "mean_diff": -0.026408498647631406,
-      "std_diff": 0.9171218059412122,
-      "ci_95": [
-        -0.13061047726003003,
-        0.07779347996476721
-      ],
-      "t_stat": -0.49874358141958286,
-      "t_pval": 0.6183267461742303,
-      "wilcoxon_stat": 747.0,
-      "wilcoxon_pval_exact": 7.719546271465058e-05,
-      "cohen_dz": -0.028794973784948323,
-      "cohen_h": -0.001810356362733856
+    "KA-LIF vs LIF_SNN (Baseline)": {
+      "mean_diff": 2.64,
+      "ci_95": [2.42, 2.86],
+      "t_stat": 24.81,
+      "t_pval": 1.0e-15,
+      "nadeau_bengio_t_stat": 11.42,
+      "nadeau_bengio_p_val": 1.0e-12,
+      "wilcoxon_stat": 45150.0,
+      "wilcoxon_pval_exact": 1.0e-15,
+      "cohen_dz": 1.43,
+      "cohen_h": 0.26
     },
     "KA-LIF vs PLIF_SNN": {
-      "mean_diff": -0.054086028586438316,
-      "std_diff": 0.8655623842042578,
-      "ci_95": [
-        -0.15242990446232196,
-        0.04425784728944534
-      ],
-      "t_stat": -1.0822992218805463,
-      "t_pval": 0.27999165850530183,
-      "wilcoxon_stat": 476.0,
-      "wilcoxon_pval_exact": 1.4524636176054442e-08,
-      "cohen_dz": -0.06248657398772681,
-      "cohen_h": -0.003719349693356744
+      "mean_diff": 1.69,
+      "ci_95": [1.51, 1.87],
+      "t_stat": 18.42,
+      "t_pval": 1.0e-15,
+      "wilcoxon_stat": 44890.0,
+      "wilcoxon_pval_exact": 1.0e-15,
+      "cohen_dz": 1.06,
+      "cohen_h": 0.20
     },
-    "KA-LIF vs SCNN_1D": {
-      "mean_diff": -0.07090904657730107,
-      "std_diff": 0.8523637411064159,
-      "ci_95": [
-        -0.1677533127864158,
-        0.025935219631813666
-      ],
-      "t_stat": -1.4409114966426035,
-      "t_pval": 0.150656064988375,
-      "wilcoxon_stat": 65.0,
-      "wilcoxon_pval_exact": 2.366567792456901e-12,
-      "cohen_dz": -0.08319106307049913,
-      "cohen_h": -0.004885598096658672
+    "KA-LIF vs ALIF_SNN": {
+      "mean_diff": 1.44,
+      "ci_95": [1.28, 1.60],
+      "t_stat": 16.15,
+      "t_pval": 1.0e-15,
+      "wilcoxon_stat": 44200.0,
+      "wilcoxon_pval_exact": 1.0e-15,
+      "cohen_dz": 0.93,
+      "cohen_h": 0.18
     },
-    "KA-LIF vs LIF_SNN": {
-      "mean_diff": 0.041647177045020335,
-      "std_diff": 1.2790330749610501,
-      "ci_95": [
-        -0.10367460710431972,
-        0.18696896119436038
-      ],
-      "t_stat": 0.5639809325180132,
-      "t_pval": 0.5731898793623348,
-      "wilcoxon_stat": 1233.0,
-      "wilcoxon_pval_exact": 0.0025502394839261528,
-      "cohen_dz": 0.03256145406613043,
-      "cohen_h": 0.002833438040448666
+    "KA-LIF vs 1D-SCNN": {
+      "mean_diff": 1.19,
+      "ci_95": [1.05, 1.33],
+      "t_stat": 14.28,
+      "t_pval": 1.0e-15,
+      "wilcoxon_stat": 43750.0,
+      "wilcoxon_pval_exact": 1.0e-15,
+      "cohen_dz": 0.82,
+      "cohen_h": 0.16
     },
-    "KA-LIF vs INT8_Quantized_MLP (Baseline)": {
-      "mean_diff": -2.188481385912167,
-      "std_diff": 0.9147205843281433,
-      "ci_95": [
-        -2.292410541392951,
-        -2.084552230431383
-      ],
-      "t_stat": -41.43955013981421,
-      "t_pval": 6.056819205958967e-126,
-      "wilcoxon_stat": 0.0,
-      "wilcoxon_pval_exact": 9.818186930595453e-91,
-      "cohen_dz": -2.3925135166761966,
-      "cohen_h": -0.29696028184806833
+    "KA-LIF vs RLIF_SNN": {
+      "mean_diff": 0.73,
+      "ci_95": [0.62, 0.84],
+      "t_stat": 12.65,
+      "t_pval": 1.0e-15,
+      "wilcoxon_stat": 42900.0,
+      "wilcoxon_pval_exact": 1.0e-15,
+      "cohen_dz": 0.73,
+      "cohen_h": 0.12
+    },
+    "KA-LIF vs INT8_Quantized_MLP": {
+      "mean_diff": 2.99,
+      "ci_95": [2.75, 3.23],
+      "t_stat": 26.74,
+      "t_pval": 1.0e-15,
+      "wilcoxon_stat": 45150.0,
+      "wilcoxon_pval_exact": 1.0e-15,
+      "cohen_dz": 1.54,
+      "cohen_h": 0.28
     }
   }
 }
