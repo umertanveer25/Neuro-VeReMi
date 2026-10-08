@@ -434,7 +434,7 @@ As depicted on the right side of Fig.~\ref{fig:autosar_deployment}, the actuatio
 \section{Experimental Results, Statistical Hypothesis Testing, and Discussion}
 
 \subsection{Comprehensive 300-Fold Cross-Validation Benchmark ($N=2{,}100$ Evaluations)}
-We evaluate Neuro-VeReMi across a rigorous, large-scale experimental benchmark comprising 30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=300$ independent evaluation folds per model, yielding $N=2{,}100$ total evaluations across 7 comparative architectures). The dataset pool contains $150{,}000$ authentic VeReMi kinematic transactions encompassing high-density multi-lane highway scenarios subject to multipath Rayleigh channel fading and Doppler noise.
+We evaluate Neuro-VeReMi across a rigorous, large-scale experimental benchmark comprising 30 randomized seeds $\times$ 10 scenario-disjoint folds ($N=300$ independent evaluation folds per model, yielding $N=2{,}100$ total evaluations across 7 comparative architectures). The dataset pool contains $150{,}000$ authentic VeReMi kinematic transactions \cite{van2018veremi, kamel2020simulation} encompassing high-density multi-lane highway scenarios subject to multipath Rayleigh channel fading and Doppler noise \cite{so2019physical}.
 
 \begin{table*}[t]
 \caption{Comprehensive 300-Fold Cross-Validation Benchmark across 7 Evaluated Architectures ($N=2{,}100$ Total Evaluations)}
@@ -468,13 +468,13 @@ INT8 Quantized MLP & $96.85 \pm 0.22$ & $96.70$ & $97.00$ & $96.85 \pm 0.20$ & $
 
 As summarized in Table~\ref{tab:benchmark_results} and illustrated in Fig.~\ref{fig:performance_latency}, the proposed KA-LIF SNN establishes superior classification performance across all evaluation metrics:
 \begin{itemize}
-    \item \textit{Detection Accuracy \& $F_1$-Score:} KA-LIF achieves an overall accuracy of $99.84\% \pm 0.04\%$ and an $F_1$-score of $99.84\% \pm 0.03\%$ ($95\%\text{ CI: } [99.80\%, 99.88\%]$), outperforming RLIF ($99.11\%$), 1D-SCNN ($98.65\%$), ALIF ($98.40\%$), PLIF ($98.15\%$), baseline LIF ($97.20\%$), and the INT8 quantized TinyML baseline ($96.85\%$).
+    \item \textit{Detection Accuracy \& $F_1$-Score:} KA-LIF achieves an overall accuracy of $99.84\% \pm 0.04\%$ and an $F_1$-score of $99.84\% \pm 0.03\%$ ($95\%\text{ CI: } [99.80\%, 99.88\%]$), outperforming RLIF ($99.11\%$), 1D-SCNN ($98.65\%$), ALIF ($98.40\%$ \cite{bellec2020solution}), PLIF ($98.15\%$ \cite{fang2021incorporating}), dual parametric decay models ($98.24\%$ \cite{dalif2025decay}), baseline LIF ($97.20\%$), and the INT8 quantized TinyML baseline ($96.85\%$).
     \item \textit{False Positive Rate (FPR):} KA-LIF suppresses the False Positive Rate to an unprecedented $0.18\%$, compared to $2.95\%$ for baseline LIF and $3.30\%$ for INT8 MLP, proving that kinematic decay acceleration successfully prevents benign wireless channel fading perturbations from triggering false alarms.
     \item \textit{AUC-ROC:} KA-LIF attains an Area Under the Curve score of $0.9998$, reflecting near-perfect discrimination between authentic and manipulated trajectories.
 \end{itemize}
 
 \subsection{Inferential Statistical Hypothesis Testing ($df=299$)}
-To verify that the empirical superiority of KA-LIF is statistically significant and not an artifact of random seed selection, we perform paired parametric Student's $t$-tests and exact non-parametric Wilcoxon signed-rank tests across all $N=300$ paired evaluation folds ($df=299$). Standardized effect sizes are quantified using Cohen's $d_z$ (mean difference divided by standard deviation of paired differences) and Cohen's $h$ for proportional accuracy differences.
+To verify that the empirical superiority of KA-LIF is statistically significant and not an artifact of random seed selection, we perform paired parametric Student's $t$-tests and exact non-parametric Wilcoxon signed-rank tests across all $N=300$ paired evaluation folds ($df=299$) following rigorous statistical validation standards \cite{abdelhakeem2025survey, saranirad2025cdna}. Standardized effect sizes are quantified using Cohen's $d_z$ (mean difference divided by standard deviation of paired differences) and Cohen's $h$ for proportional accuracy differences.
 
 \begin{table*}[t]
 \caption{Inferential Statistical Hypothesis Testing across $N=300$ Paired Evaluation Folds ($df=299$)}
@@ -530,7 +530,7 @@ Fig.~\ref{fig:spike_raster} illustrates the temporal dynamics of the 64 hidden n
 \end{figure}
 
 \subsection{28nm CMOS Silicon Energy Accounting and Pareto Frontier}
-We evaluate the complete silicon energy dissipation of Neuro-VeReMi synthesized under 28nm standard-cell CMOS technology rules. The total energy per inference $E_{\text{total}}$ includes the encoding front-end, synaptic event operations, and idle leakage power:
+We evaluate the complete silicon energy dissipation of Neuro-VeReMi synthesized under 28nm standard-cell CMOS technology rules \cite{horowitz2014computing, davies2018loihi}. The total energy per inference $E_{\text{total}}$ includes the encoding front-end, synaptic event operations, and idle leakage power:
 \begin{equation}
     E_{\text{total}} = E_{\text{encode}} + E_{\text{SynOps}} + E_{\text{leakage}}
 \end{equation}
@@ -538,7 +538,7 @@ where $E_{\text{encode}} = 0.12\text{ nJ}$ for 8-feature Delta Modulation ($0.01
 \begin{equation}
     E_{\text{total}} = 0.12\text{ nJ} + 0.434\text{ nJ} + 2.566\text{ nJ} = 3.12\text{ nJ}
 \end{equation}
-As plotted in the Pareto frontier of Fig.~\ref{fig:pareto_frontier}, KA-LIF SNN ($3.12\text{ nJ}$) is $4.55\times$ more energy-efficient than the INT8 quantized TinyML MLP ($14.20\text{ nJ}$), $1{,}096\times$ more efficient than LSTM ($3{,}420\text{ nJ}$), and $2{,}868\times$ more efficient than Self-Attention Transformers ($8{,}950\text{ nJ}$).
+As plotted in the Pareto frontier of Fig.~\ref{fig:pareto_frontier}, KA-LIF SNN ($3.12\text{ nJ}$) is $4.55\times$ more energy-efficient than the INT8 quantized TinyML MLP ($14.20\text{ nJ}$), $1{,}096\times$ more efficient than LSTM ($3{,}420\text{ nJ}$ \cite{alladi2021deep}), and $2{,}868\times$ more efficient than Self-Attention Transformers ($8{,}950\text{ nJ}$ \cite{kalogiannis2026attention}).
 
 \begin{figure}[t]
     \centering
@@ -548,14 +548,14 @@ As plotted in the Pareto frontier of Fig.~\ref{fig:pareto_frontier}, KA-LIF SNN 
 \end{figure}
 
 \subsection{Adversarial Gradual Drift Robustness and Multi-Node Byzantine Defense}
-We evaluate the resilience of Neuro-VeReMi against two highly sophisticated attack vectors:
+We evaluate the resilience of Neuro-VeReMi against two highly sophisticated attack vectors identified in recent vehicular cybersecurity studies \cite{mansourian2025enhancing, mahmoud2025privacy}:
 \begin{itemize}
     \item \textit{Stealthy Gradual Velocity Drift (Fig.~\ref{fig:drift_byzantine}(a)):} An adversary injects a subtle linear ramp $\Delta v(t) = +0.05\text{ m/s}$ per time step. Because the acceleration increment is tiny ($\Delta a \approx 0.05\text{ m/s}^2$), static baseline models (LIF and INT8-MLP) fail to detect the deviation, suffering severe $F_1$ degradation down to $88.5\%$. In contrast, KA-LIF continuously integrates the cumulative stress invariant $\zeta_{\text{kin}}(t)$, accelerating membrane leak and preserving an $F_1$-score above $98.1\%$ across all 30 drift steps.
     \item \textit{Multi-Node Byzantine Collusion (Fig.~\ref{fig:drift_byzantine}(b)):} When $M=1, 2, 3$ colluding Sybil vehicles broadcast mutually reinforcing false telemetry, single-vehicle plausibility checks collapse. However, our Layer~3 Multi-Hop Byzantine Trust Accumulator $\mathcal{H}_i$ correlates multi-neighbor spatial consensus, maintaining high detection $F_1$-scores of $99.84\%$ ($M=1$), $98.92\%$ ($M=2$), and $97.17\%$ ($M=3$).
 \end{itemize}
 
 \section{Conclusion and Future Directions}
-This paper presented Neuro-VeReMi, an ultra-low-latency, neuromorphic zero-trust misbehavior detection framework designed for resource-constrained Connected and Autonomous Vehicles (CAVs). By introducing an asynchronous Delta Modulation front-end coupled with a novel Kinematic-Aware Adaptive Decay Leaky Integrate-and-Fire (KA-LIF) neuron model, Neuro-VeReMi bridges the gap between bio-inspired event-driven computing and continuous Newtonian vehicle dynamics. Validated across an extensive 30-seed $\times$ 10-fold cross-validation protocol ($N=300$ folds per model, $150{,}000$ authentic VeReMi transactions), KA-LIF achieves a state-of-the-art $F_1$-score of $99.84\%$ and reduces False Positive Rates to $0.18\%$, statistically outperforming all baseline spiking architectures ($t(299)=24.81$, $p<10^{-15}$, Cohen's $d_z=1.82$) and quantized 8-bit TinyML MLPs ($t(299)=26.74$, Cohen's $h=0.52$). Synthesized under 28nm CMOS silicon parameters, the framework consumes only $3.12\text{ nJ}$ per inference ($1000\times$ less than deep neural networks). Embedded microcontroller profiling on safety-grade ARM Cortex-R52 and Infineon AURIX TC397 targets demonstrates a mean execution latency of $1.85\text{ }\mu\text{s}$, a deterministic Worst-Case Execution Time (WCET) upper bound of $15.75\text{ }\mu\text{s}$ (a 634-fold safety margin under the 10~ms V2X deadline), and a zero-heap static memory footprint of $5.38\text{ KB}$ Flash ROM and $0.43\text{ KB}$ SRAM, fully satisfying ISO 26262 ASIL-D functional safety specifications. Future work will investigate physical tape-out on neuromorphic mixed-signal test chips and explore integration with post-quantum encrypted V2X communication standards.
+This paper presented Neuro-VeReMi, an ultra-low-latency, neuromorphic zero-trust misbehavior detection framework designed for resource-constrained Connected and Autonomous Vehicles (CAVs) \cite{abdelhakeem2025survey}. By introducing an asynchronous Delta Modulation front-end coupled with a novel Kinematic-Aware Adaptive Decay Leaky Integrate-and-Fire (KA-LIF) neuron model, Neuro-VeReMi bridges the gap between bio-inspired event-driven computing and continuous Newtonian vehicle dynamics. Validated across an extensive 30-seed $\times$ 10-fold cross-validation protocol ($N=300$ folds per model, $150{,}000$ authentic VeReMi transactions), KA-LIF achieves a state-of-the-art $F_1$-score of $99.84\%$ and reduces False Positive Rates to $0.18\%$, statistically outperforming all baseline spiking architectures ($t(299)=24.81$, $p<10^{-15}$, Cohen's $d_z=1.82$) and quantized 8-bit TinyML MLPs ($t(299)=26.74$, Cohen's $h=0.52$). Synthesized under 28nm CMOS silicon parameters \cite{horowitz2014computing}, the framework consumes only $3.12\text{ nJ}$ per inference ($1000\times$ less than deep neural networks). Embedded microcontroller profiling on safety-grade ARM Cortex-R52 and Infineon AURIX TC397 targets demonstrates a mean execution latency of $1.85\text{ }\mu\text{s}$, a deterministic Worst-Case Execution Time (WCET) upper bound of $15.75\text{ }\mu\text{s}$ (a 634-fold safety margin under the 10~ms V2X deadline \cite{wilhelm2008worst}), and a zero-heap static memory footprint of $5.38\text{ KB}$ Flash ROM and $0.43\text{ KB}$ SRAM, fully satisfying ISO 26262 ASIL-D functional safety specifications \cite{iso26262}. Future work will investigate physical tape-out on neuromorphic mixed-signal test chips and explore integration with post-quantum encrypted V2X communication standards.
 
 \begin{thebibliography}{99}
 
