@@ -14,68 +14,12 @@
 ![Figure 1: System Architecture & End-to-End Pipeline](results/Fig1_System_Architecture_Pipeline.png)
 *Fig. 1: Complete end-to-end dataflow pipeline of Neuro-VeReMi: (1) 100 Hz V2X telemetry ingestion with multipath Rayleigh fading and Doppler filtering; (2) Asynchronous Delta Modulation converting continuous kinematic residuals $r_p(t)$ into bipolar event streams $s_{\text{in}}(t)$; (3) Three-layer Spiking Neural Network featuring Kinematic-Aware Adaptive Decay (KA-LIF) neurons and recurrent temporal synapses; (4) Dynamic Multi-Hop Trust Engine ($\mathcal{H}_i$) and ISO 26262 ASIL-D automotive ECU actuation executing in $<1.85\,\mu\text{s}$ with $3.12\,\text{nJ}$ energy consumption.*
 
-```mermaid
-flowchart LR
-    subgraph S1["1. V2X Telemetry Ingestion (100 Hz)"]
-        A1["Cooperative Awareness (CAM) / BSM"] --> A2["Newtonian Invariant Extractor\n(rp, rv, ra, Heading)"]
-        A3["DSRC / C-V2X Radio Receiver"] --> A4["Multipath Rayleigh & Doppler Filter\n(Pr ∝ d^-α · |CN(0,1)|^2)"]
-    end
-
-    subgraph S2["2. Neuromorphic Event Encoding"]
-        A2 & A4 --> B1["Dual Delta-Modulation Thresholds\n(+θ / -θ Derivative Filter)"]
-        B1 --> B2["Asynchronous Spike Streams\n(ON/OFF Spikes: s_in(t) ∈ {-1, 0, +1}^16)"]
-    end
-
-    subgraph S3["3. Kinematic-Aware Spiking Core (KA-LIF)"]
-        B2 --> C1["Layer 1: 64 KA-LIF Neurons\n(Dynamic Decay: β(t) = β_0 · exp(-λ ζ_kin))"]
-        C1 --> C2["Layer 2: 64 Recurrent Neurons\n(Recurrent Feedback: W_rec · s(t-1))"]
-        C2 --> C3["Layer 3: 2 Readout Neurons\n(Membrane Potential Integrator)"]
-    end
-
-    subgraph S4["4. Zero-Trust Verdict & ECU Actuation"]
-        C3 --> D1["Dynamic Multi-Hop Trust Engine\n(Trust Accumulator H_i(t))"]
-        D1 --> D2["Zero-Trust Verdict\n(Benign vs. Adversarial Anomaly)"]
-        D2 --> D3["AUTOSAR SW-C Interface\n(<1.85 µs Latency | ISO 26262 ASIL-D)"]
-    end
-
-    style S1 fill:#f0f4f8,stroke:#2b6cb0,stroke-width:2px;
-    style S2 fill:#edf2f7,stroke:#4a5568,stroke-width:2px;
-    style S3 fill:#e6fffa,stroke:#319795,stroke-width:2px;
-    style S4 fill:#feebc8,stroke:#dd6b20,stroke-width:2px;
-```
-
 ---
 
 ## 🔬 2. Neuronal Dynamics: Kinematic-Aware Adaptive Decay (`KA-LIF`)
 
 ![Figure 2: KA-LIF Neuronal Dynamics Circuit Schematic](results/Fig2_KALIF_Neuronal_Dynamics.png)
 *Fig. 2: Detailed circuit schematic and computational signal flow of the proposed Kinematic-Aware Adaptive Decay Leaky Integrate-and-Fire (KA-LIF) model. Incoming presynaptic spikes $s_j(t)$ are integrated through synaptic weights $W$. Simultaneously, the Kinematic Stress Estimator evaluates Newtonian velocity deviations $|\Delta v_i(t)|$ and jerk invariants $|\Delta a_i(t)|$ to dynamically accelerate the membrane leak rate $\beta_i(t) = \beta_0 \exp(-\lambda_k \zeta_{\text{kin}}(t))$. The threshold comparator ($V_{\text{th}} = 0.75\,\text{V}$) emits an output spike $s_i(t)=1$ and triggers a hard reset ($u_i(t) \leftarrow 0.0\,\text{V}$) with a refractory guard period $\tau_{\text{ref}}$.*
-
-```mermaid
-stateDiagram-v2
-    [*] --> SubThreshold_Integration : Incoming Spike Train s_in(t)
-    
-    state SubThreshold_Integration {
-        [*] --> Compute_Kinematic_Stress
-        Compute_Kinematic_Stress --> Modulate_Decay_Rate : ζ_kin(t) = |Δv|/v_ref + |Δa|/a_max
-        Modulate_Decay_Rate --> Leak_Membrane_Potential : β_i(t) = β_0 · exp(-λ_k · ζ_kin(t))
-        Leak_Membrane_Potential --> Synaptic_Accumulation : u_i(t) = β_i(t)·u_i(t-1) + W·s(t)
-    }
-
-    SubThreshold_Integration --> Threshold_Check : u_i(t) evaluated
-    
-    state Threshold_Check <<choice>>
-    Threshold_Check --> Fire_Spike : u_i(t) >= V_th (0.75 V)
-    Threshold_Check --> SubThreshold_Integration : u_i(t) < V_th
-
-    state Fire_Spike {
-        [*] --> Emit_Output_Spike : s_out(t) = 1
-        Emit_Output_Spike --> Hard_Reset_Membrane : u_i(t) = 0.0 V
-        Hard_Reset_Membrane --> Refractory_Period : τ_ref = 1 time-step
-    }
-
-    Fire_Spike --> SubThreshold_Integration : Next time-step (t + 1)
-```
 
 ---
 
