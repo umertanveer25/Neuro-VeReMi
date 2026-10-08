@@ -42,6 +42,7 @@ The paradigm of modern vehicular transportation is undergoing a fundamental tran
 \caption{Mathematical Notations and System Parameters}
 \label{tab:notations}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{ll}
 \hline
 \hline
@@ -67,7 +68,8 @@ $E_{\text{SynOp}}$ & Energy consumed per synaptic addition ($0.9\text{ pJ}$ on 2
 $E_{\text{MAC}}$ & Energy consumed per multiply-accumulate ($4.6\text{ pJ}$ on 28nm CMOS) \\
 \hline
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \subsection{Vulnerabilities of V2X Wireless Telemetry and Threat Landscape}
@@ -104,6 +106,7 @@ Cooperative Intelligent Transportation Systems (C-ITS) utilize dedicated wireles
 \caption{Taxonomy of Intrusion Detection Schemes, Temporal Encoders, and Computing Paradigms in V2X Networks}
 \label{tab:related_work_taxonomy}
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llllll}
 \hline
 \hline
@@ -119,7 +122,8 @@ Time-to-First-Spike (TTFS) SNN & Event-Driven Phase & $0.18\text{ nJ}$ (enc) & $
 Proposed Delta KA-LIF SNN & Event-Driven Bipolar & $0.12\text{ nJ}$ (enc) / $3.12\text{ nJ}$ & $1.85\text{ }\mu\text{s}$ & ARM Cortex-R52 & Optimal: Acts as Newtonian derivative filter \\
 \hline
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 
 \subsection{Machine Learning and Deep Learning Baselines for V2X Security}
@@ -145,7 +149,10 @@ Neuro-VeReMi is explicitly architected to overcome these three fundamental limit
 \subsection{Cooperative V2X System Model and Kinematic Telemetry Formulation}
 We formulate a cooperative vehicular ad-hoc network consisting of $N_v$ connected and autonomous vehicles traversing a multi-lane highway corridor. Each vehicle $i \in \{1, 2, \dots, N_v\}$ is equipped with an onboard sensor suite (GNSS, IMU, wheel speed sensors) and a 5.9~GHz C-V2X / DSRC transceiver. Vehicles periodically broadcast Basic Safety Messages (BSMs) at a standard beacon frequency of 100~Hz ($T_{\text{beacon}} = 10\text{ ms}$). The ingested continuous kinematic telemetry state vector of vehicle $i$ at discrete time step $t$ is expressed as:
 \begin{equation}
-    x_i(t) = \big[ p_{x,i}(t),\, p_{y,i}(t),\, v_{x,i}(t),\, v_{y,i}(t),\, a_{x,i}(t),\, a_{y,i}(t),\, \psi_i(t) \big]^T \in \mathbb{R}^7
+\begin{split}
+    x_i(t) = \big[ &p_{x,i}(t),\, p_{y,i}(t),\, v_{x,i}(t),\, v_{y,i}(t), \\
+    &a_{x,i}(t),\, a_{y,i}(t),\, \psi_i(t) \big]^T \in \mathbb{R}^7
+\end{split}
 \end{equation}
 where $p_{x,i}(t)$ and $p_{y,i}(t)$ represent 2D UTM longitudinal and lateral position coordinates, $v_{x,i}(t)$ and $v_{y,i}(t)$ denote orthogonal velocity vectors, $a_{x,i}(t)$ and $a_{y,i}(t)$ define instantaneous longitudinal and lateral accelerations, and $\psi_i(t)$ represents the heading angle relative to true North.
 
@@ -182,6 +189,7 @@ where $v_{\text{rel}}(t)$ is the relative velocity vector and $\theta(t)$ is the
 \caption{VeReMi Attack Taxonomy, Mathematical Attack Formulations, Physical Invariant Violations, and Neuromorphic SNN Defense Layer Mapping}
 \label{tab:attack_taxonomy_mapping}
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lllll}
 \hline
 \hline
@@ -195,7 +203,8 @@ Temporal Domain & Type 16: Eventual Stop & $\tilde{v}_{x,i}(t) = \max(0, v_{x,i}
 Collusion Domain & Multi-Node Byzantine Sybil & $\tilde{x}_{m}(t) = \tilde{x}_{\text{target}}(t) + \epsilon_m, \forall m \in \{1, \dots, M\}$ & Multi-vehicle cross-correlation inconsistency & Layer 3: Byzantine Trust $\mathcal{H}_i$ \\
 \hline
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 
 \subsection{Multi-Layer VeReMi Attack Defense Taxonomy}
@@ -274,7 +283,10 @@ where $|\Delta v_i(t)|$ is the velocity discrepancy relative to preceding traffi
 
 The membrane potential $u_i(t)$ of neuron $i$ in layer $l$ evolves across discrete simulation time steps according to:
 \begin{equation}
-    u_i^{(l)}(t) = \beta_i(t) \cdot u_i^{(l)}(t - 1) \cdot \big(1 - s_i^{(l)}(t - 1)\big) + \sum_{j} W_{ij}^{(l)} s_j^{(l-1)}(t) + I_{\text{ext}}
+\begin{split}
+    u_i^{(l)}(t) &= \beta_i(t) \cdot u_i^{(l)}(t - 1) \cdot \big(1 - s_i^{(l)}(t - 1)\big) \\
+    &\quad + \sum_{j} W_{ij}^{(l)} s_j^{(l-1)}(t) + I_{\text{ext}}
+\end{split}
 \end{equation}
 where $W_{ij}^{(l)}$ represents the synaptic weight from presynaptic neuron $j$, $s_j^{(l-1)}(t)$ is the incoming spike event, $I_{\text{ext}}$ is an external baseline bias, and $\beta_i(t)$ is the dynamic kinematic leak factor formulated as:
 \begin{equation}
@@ -313,7 +325,8 @@ To protect against multi-node Byzantine Sybil rings ($M=1, 2, 3$ colluders), the
 \begin{equation}
 \begin{split}
     \mathcal{H}_i(t) 
-    &= \gamma_h \cdot \mathcal{H}_i(t - 1) + (1 - \gamma_h) \left( 1 - \frac{1}{T_w}\sum_{\tau=0}^{T_w - 1} s_{\text{out}, i}(t - \tau) \right) \\
+    &= \gamma_h \mathcal{H}_i(t - 1) + (1 - \gamma_h) \\
+    &\quad \times \left( 1 - \frac{1}{T_w}\sum_{\tau=0}^{T_w - 1} s_{\text{out}, i}(t - \tau) \right) \\
     &\quad \times \prod_{k \in \mathcal{N}_i} \big(1 - \omega_{ik} \mathcal{D}_{ik}(t)\big)
 \end{split}
 \end{equation}
@@ -378,6 +391,7 @@ As documented in Table~\ref{tab:ecu_deployment_benchmarks}, this minuscule footp
 \caption{Automotive ECU Embedded Deployment, Memory Allocation, and Real-Time Hardware Profiling}
 \label{tab:ecu_deployment_benchmarks}
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lllllll}
 \hline
 \hline
@@ -388,7 +402,8 @@ Infineon AURIX TC397 (Auto ECU) & 32-bit TriCore @ 300~MHz & $5.38\text{ KB}$ & 
 STM32 NUCLEO-F4 (Edge MCU) & Cortex-M4 @ 168~MHz & $5.38\text{ KB}$ & $0.43\text{ KB}$ & $4.38\text{ }\mu\text{s}$ & $37.50\text{ }\mu\text{s}$ & $0.75\text{ }\mu\text{W}$ \\
 \hline
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 
 \subsection{Real-Time Timing Guarantees and Worst-Case Execution Time (WCET)}
@@ -425,6 +440,7 @@ We evaluate Neuro-VeReMi across a rigorous, large-scale experimental benchmark c
 \caption{Comprehensive 300-Fold Cross-Validation Benchmark across 7 Evaluated Architectures ($N=2{,}100$ Total Evaluations)}
 \label{tab:benchmark_results}
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lllllllllll}
 \hline
 \hline
@@ -439,7 +455,8 @@ LIF SNN (Baseline) & $97.20 \pm 0.18$ & $97.05$ & $97.35$ & $97.20 \pm 0.16$ & $
 INT8 Quantized MLP & $96.85 \pm 0.22$ & $96.70$ & $97.00$ & $96.85 \pm 0.20$ & $[96.62, 97.08]$ & $3.30$ & $0.9845$ & $5{,}248.0\text{ MACs}$ & $14.20\text{ nJ}$ & $9.85\text{ }\mu\text{s}$ \\
 \hline
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 
 \begin{figure}[t]
@@ -463,6 +480,7 @@ To verify that the empirical superiority of KA-LIF is statistically significant 
 \caption{Inferential Statistical Hypothesis Testing across $N=300$ Paired Evaluation Folds ($df=299$)}
 \label{tab:statistical_testing}
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llllllllll}
 \hline
 \hline
@@ -476,7 +494,8 @@ KA-LIF vs. RLIF & $+0.73\%$ & $[+0.62\%, +0.84\%]$ & $12.65$ & $< 10^{-15}$ & $4
 KA-LIF vs. INT8 MLP & $+2.99\%$ & $[+2.75\%, +3.23\%]$ & $26.74$ & $< 10^{-15}$ & $45{,}150.0$ & $< 10^{-15}$ & $1.96$ & $0.52$ & $p < 0.001$ \\
 \hline
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 
 \begin{figure}[t]
