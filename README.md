@@ -25,33 +25,8 @@
 
 ## 🛡️ 3. Multi-Layer Threat Model & VeReMi Attack Defense Taxonomy
 
-```mermaid
-graph TD
-    Root["VeReMi Attack Taxonomy & Neuromorphic Defenses"] --> A["Spatial-Domain Spoofing"]
-    Root --> B["Velocity-Domain Manipulation"]
-    Root --> C["Temporal & Coordinated Collusion"]
-
-    A --> A1["Type 1: Constant Position\n(Static Ghost Vehicle Coordinates)"]
-    A --> A2["Type 2: Random Position\n(Spatial Coordinate Jitter & Hopping)"]
-    
-    B --> B1["Type 4: Constant Speed\n(Fixed Speed Invariant Bypass)"]
-    B --> B2["Type 8: Random Speed\n(Phantom Braking & Traffic Shockwaves)"]
-    
-    C --> C1["Type 16: Eventual Stop\n(Gradual Speed Decay Evasion)"]
-    C --> C2["Multi-Node Byzantine\n(M=1,2,3 Colluding Sybil Attackers)"]
-
-    A1 & A2 --> D1["Delta-Modulation Derivative Filter\n(Detects Δrp Newtonian Discontinuities)"]
-    B1 & B2 --> D2["KA-LIF Dynamic Decay Acceleration\n(Membrane Leaks Out on High Velocity Jitter)"]
-    C1 & C2 --> D3["Recurrent Synapses & Trust Accumulator\n(Multi-Hop Memory H_i Identifies Slow Drift)"]
-
-    style Root fill:#2d3748,color:#fff,stroke:#1a202c,stroke-width:2px;
-    style A fill:#ebf8ff,stroke:#3182ce,stroke-width:2px;
-    style B fill:#feebc8,stroke:#dd6b20,stroke-width:2px;
-    style C fill:#fed7d7,stroke:#e53e3e,stroke-width:2px;
-    style D1 fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
-    style D2 fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
-    style D3 fill:#c6f6d5,stroke:#38a169,stroke-width:2px;
-```
+![Figure: Multi-Layer Threat Model & VeReMi Attack Defense Taxonomy](results/Fig_VeReMi_Threat_Model_Taxonomy.png)
+*Multi-layer V2X threat model and neuromorphic attack defense taxonomy. Ingested 5.9 GHz DSRC/C-V2X BSM telemetry subject to Spatial Domain (Types 1 & 2), Velocity Domain (Types 4 & 8), and Temporal/Collusion Domain (Type 16 & Byzantine Sybil rings) attacks are processed through the 3-layer Neuromorphic Defense Stack (Delta-Rate Spike Encoding, Kinematic-Aware KA-LIF SNN, and Multi-Hop Byzantine Trust Accumulator $H_i$) to isolate adversarial anomalies in $< 0.28\,\text{ms}$ under ISO 26262 ASIL-D functional safety constraints.*
 
 ---
 
