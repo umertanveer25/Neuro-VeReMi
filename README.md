@@ -11,7 +11,7 @@
 
 ## 📌 1. System Architecture & End-to-End Pipeline Diagram
 
-![System Architecture & End-to-End Pipeline](results/Fig_System_Architecture_Pipeline.png)
+![Figure 1: System Architecture & End-to-End Pipeline](results/Fig1_System_Architecture_Pipeline.png)
 *Fig. 1: Complete end-to-end dataflow pipeline of Neuro-VeReMi: (1) 100 Hz V2X telemetry ingestion with multipath Rayleigh fading and Doppler filtering; (2) Asynchronous Delta Modulation converting continuous kinematic residuals $r_p(t)$ into bipolar event streams $s_{\text{in}}(t)$; (3) Three-layer Spiking Neural Network featuring Kinematic-Aware Adaptive Decay (KA-LIF) neurons and recurrent temporal synapses; (4) Dynamic Multi-Hop Trust Engine ($\mathcal{H}_i$) and ISO 26262 ASIL-D automotive ECU actuation executing in $<1.85\,\mu\text{s}$ with $3.12\,\text{nJ}$ energy consumption.*
 
 ```mermaid
@@ -48,8 +48,8 @@ flowchart LR
 
 ## 🔬 2. Neuronal Dynamics: Kinematic-Aware Adaptive Decay (`KA-LIF`)
 
-![KA-LIF Neuronal Dynamics Circuit Schematic](results/Fig_KALIF_Neuronal_Dynamics.png)
-*Fig. 2A: Detailed circuit schematic and computational signal flow of the proposed Kinematic-Aware Adaptive Decay Leaky Integrate-and-Fire (KA-LIF) model. Incoming presynaptic spikes $s_j(t)$ are integrated through synaptic weights $W$. Simultaneously, the Kinematic Stress Estimator evaluates Newtonian velocity deviations $|\Delta v_i(t)|$ and jerk invariants $|\Delta a_i(t)|$ to dynamically accelerate the membrane leak rate $\beta_i(t) = \beta_0 \exp(-\lambda_k \zeta_{\text{kin}}(t))$. The threshold comparator ($V_{\text{th}} = 0.75\,\text{V}$) emits an output spike $s_i(t)=1$ and triggers a hard reset ($u_i(t) \leftarrow 0.0\,\text{V}$) with a refractory guard period $\tau_{\text{ref}}$.*
+![Figure 2: KA-LIF Neuronal Dynamics Circuit Schematic](results/Fig2_KALIF_Neuronal_Dynamics.png)
+*Fig. 2: Detailed circuit schematic and computational signal flow of the proposed Kinematic-Aware Adaptive Decay Leaky Integrate-and-Fire (KA-LIF) model. Incoming presynaptic spikes $s_j(t)$ are integrated through synaptic weights $W$. Simultaneously, the Kinematic Stress Estimator evaluates Newtonian velocity deviations $|\Delta v_i(t)|$ and jerk invariants $|\Delta a_i(t)|$ to dynamically accelerate the membrane leak rate $\beta_i(t) = \beta_0 \exp(-\lambda_k \zeta_{\text{kin}}(t))$. The threshold comparator ($V_{\text{th}} = 0.75\,\text{V}$) emits an output spike $s_i(t)=1$ and triggers a hard reset ($u_i(t) \leftarrow 0.0\,\text{V}$) with a refractory guard period $\tau_{\text{ref}}$.*
 
 ```mermaid
 stateDiagram-v2
@@ -208,39 +208,51 @@ flowchart TD
 
 ## 🖼️ 6. High-Resolution Publication Figures (300 DPI)
 
-### **Figure 1: SNN Architecture Overview & Kinematic Delta Modulation Encodings**
-![Figure 1: SNN Architecture Overview](results/Fig1_SNN_Architecture_and_Spike_Encodings.png)
-*Fig. 1: (a) Continuous kinematic invariant residual $r_p(t)$ with differential thresholds. (b) Asynchronous Delta Modulation ON/OFF spike trains. (c) KA-LIF membrane potential dynamics with acceleration-dependent dynamic decay $\beta_i(t)$ and threshold reset.*
+### **Figure 1: End-to-End System Architecture & Pipeline**
+![Figure 1: System Architecture](results/Fig1_System_Architecture_Pipeline.png)
+*Fig. 1: Complete 4-stage dataflow pipeline: V2X Ingestion (100 Hz) $\rightarrow$ Delta-Modulation Spike Encoding $\rightarrow$ 3-Layer KA-LIF Spiking Network $\rightarrow$ Zero-Trust ECU Actuation ($<1.85\,\mu\text{s}$, $3.12\,\text{nJ}$).*
 
 ---
 
-### **Figure 2: Multi-Architecture Performance & Real-Time Latency Comparison ($N=300$ Folds)**
-![Figure 2: Performance and Latency Comparison](results/Fig2_Intra_SNN_Performance_Comparison.png)
-*Fig. 2: Benchmark evaluation of $F_1$-score (left axis, blue) and inference latency on ARM Cortex-R52 (right axis, orange) across all 7 evaluated architectures ($N=300$ folds per model).*
+### **Figure 2: KA-LIF Neuronal Dynamics Circuit Schematic**
+![Figure 2: KA-LIF Neuronal Dynamics](results/Fig2_KALIF_Neuronal_Dynamics.png)
+*Fig. 2: Biophysical-to-computational signal flow of KA-LIF: Presynaptic spikes $s_j(t)$ integrate through weights $W$ while the Kinematic Stress Estimator $\zeta_{\text{kin}}(t)$ accelerates dynamic decay $\beta_i(t) = \beta_0 \exp(-\lambda_k \zeta_{\text{kin}})$.*
 
 ---
 
-### **Figure 3: Hidden Layer Spike Raster & Output Membrane Potential Dynamics**
-![Figure 3: Spike Raster and Membrane Dynamics](results/Fig3_SNN_Spike_Raster_and_Membrane_Dynamics.png)
-*Fig. 3: (a) Spiking raster plot of 64 hidden neurons under sparse benign telemetry ($t < 10$) transitioning to dense firing during VeReMi attack injection ($t \ge 10$). (b) Corresponding output classification membrane voltages demonstrating rapid convergence to the malicious class.*
+### **Figure 3: Kinematic Delta Modulation Encodings & Voltage Reset**
+![Figure 3: Delta Modulation & Voltage Reset](results/Fig3_Spike_Encoding_and_Voltage_Reset.png)
+*Fig. 3: (a) Continuous kinematic invariant residual $r_p(t)$ with differential bounds $\pm\theta$. (b) Asynchronous Delta Modulation ON/OFF spike trains. (c) KA-LIF membrane potential dynamics with threshold firing ($V_{\text{th}} = 0.75\,\text{V}$) and instant hard reset to $0.0\,\text{V}$.*
 
 ---
 
-### **Figure 4: Energy vs Accuracy Pareto Frontier (SNNs vs. INT8 TinyML vs. Deep Learning)**
-![Figure 4: Energy vs Accuracy Pareto Frontier](results/Fig4_SynOps_and_Energy_Consumption_Pareto.png)
-*Fig. 4: Energy-Accuracy Pareto frontier on 28nm CMOS silicon. SNNs occupy the ultra-low-power region ($<8\,\text{nJ}$), outperforming INT8 quantized MLPs ($14.2\,\text{nJ}$) and heavy Transformer/LSTM architectures ($>3,000\,\text{nJ}$).*
+### **Figure 4: Multi-Architecture Performance & Real-Time Latency Comparison ($N=300$ Folds)**
+![Figure 4: Performance and Latency Comparison](results/Fig4_Multi_Model_Performance_and_Latency.png)
+*Fig. 4: Benchmark evaluation of $F_1$-score (left axis, blue) and inference latency on ARM Cortex-R52 (right axis, orange) across all 7 evaluated architectures ($N=300$ folds per model).*
 
 ---
 
-### **Figure 5: Adversarial Gradual Drift ($+0.05\,\text{m/s}$) & Multi-Node Byzantine Defense**
-![Figure 5: Adversarial Drift and Byzantine Robustness](results/Fig5_Adversarial_Drift_and_Byzantine_Robustness.png)
-*Fig. 5: (a) $F_1$-score degradation under stealthy gradual drift attacks ($+0.05\,\text{m/s}$ ramp per step) showing KA-LIF resilience due to dynamic membrane leak acceleration. (b) Multi-node Byzantine collusion defense against $M=1, 2, 3$ colluding rogue vehicles.*
+### **Figure 5: Hidden Layer Spike Raster & Output Membrane Potential Dynamics**
+![Figure 5: Spike Raster and Membrane Dynamics](results/Fig5_Spike_Raster_and_Membrane_Dynamics.png)
+*Fig. 5: (a) Spiking raster plot of 64 hidden neurons under sparse benign telemetry ($t < 10$) transitioning to dense firing during VeReMi attack injection ($t \ge 10$). (b) Corresponding output classification membrane voltages demonstrating rapid convergence to the malicious class.*
 
 ---
 
-### **Figure 6: Grouped Scenario-Disjoint Statistical Boxplots across 300 Folds ($df=299$)**
-![Figure 6: Statistical Validation Boxplots](results/Fig6_Statistical_Validation_Boxplots.png)
-*Fig. 6: Grouped scenario-disjoint 30-seed $\times$ 10-fold cross-validation variance boxplots ($N=300$ folds, $150,000$ transactions). Statistically significant superiority of KA-LIF-SNN is established at $p < 10^{-15}$, $t(299) = 24.81$, and Cohen's $d_z = 1.82$.*
+### **Figure 6: Energy vs Accuracy Pareto Frontier (SNNs vs. INT8 TinyML vs. Deep Learning)**
+![Figure 6: Energy vs Accuracy Pareto Frontier](results/Fig6_Energy_Accuracy_Pareto_Frontier.png)
+*Fig. 6: Energy-Accuracy Pareto frontier on 28nm CMOS silicon. SNNs occupy the ultra-low-power region ($<8\,\text{nJ}$), outperforming INT8 quantized MLPs ($14.2\,\text{nJ}$) and heavy Transformer/LSTM architectures ($>3,000\,\text{nJ}$).*
+
+---
+
+### **Figure 7: Adversarial Gradual Drift ($+0.05\,\text{m/s}$) & Multi-Node Byzantine Defense**
+![Figure 7: Adversarial Drift and Byzantine Robustness](results/Fig7_Adversarial_Drift_and_Byzantine_Defense.png)
+*Fig. 7: (a) $F_1$-score degradation under stealthy gradual drift attacks ($+0.05\,\text{m/s}$ ramp per step) showing KA-LIF resilience due to dynamic membrane leak acceleration. (b) Multi-node Byzantine collusion defense against $M=1, 2, 3$ colluding rogue vehicles.*
+
+---
+
+### **Figure 8: Grouped Scenario-Disjoint Statistical Boxplots across 300 Folds ($df=299$)**
+![Figure 8: Statistical Validation Boxplots](results/Fig8_Statistical_Validation_Boxplots.png)
+*Fig. 8: Grouped scenario-disjoint 30-seed $\times$ 10-fold cross-validation variance boxplots ($N=300$ folds, $150,000$ transactions). Statistically significant superiority of KA-LIF-SNN is established at $p < 10^{-15}$, $t(299) = 24.81$, and Cohen's $d_z = 1.82$.*
 
 ---
 
@@ -264,8 +276,9 @@ Neuro-VeReMi/
 │   └── statistical_engine.py     # Paired t-test t(299), Wilcoxon W+, Cohen's d_z & h
 ├── experiments/
 │   ├── run_parallel_30seed_benchmark.py  # 16-core parallel 30-seed 10-fold CV orchestrator
-│   └── generate_publication_figures.py   # Publication-quality 300 DPI figures generator
-├── results/                      # Output CSV tables (Table 1, Table 4), JSON, and Figures
+│   ├── generate_publication_figures.py   # Publication-quality 300 DPI figures generator
+│   └── plot_fig1_exact_300dpi.py         # Standalone exact vector generator for Fig 3
+├── results/                      # Standardized publication figures (Fig 1 to Fig 8), CSVs, JSON
 ├── reviewer_1_comments.md        # Reviewer 1 (Novelty & Contribution) Assessment
 ├── reviewer_2_comments.md        # Reviewer 2 (Physics & Methodology) Assessment
 ├── reviewer_3_comments.md        # Reviewer 3 (Automotive Safety & Systems) Assessment

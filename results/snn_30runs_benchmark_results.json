@@ -2,72 +2,142 @@
   "num_seeds": 30,
   "k_folds": 10,
   "total_evaluations_per_model": 300,
-  "total_models": 7,
-  "total_fold_evaluations": 2100,
-  "dataset": "Authentic VeReMi Kinematics (Types 1, 2, 4, 8, 16, Krauss Car-Following, Multi-path Fading)",
+  "total_execution_time_seconds": 4045.566394329071,
   "benchmark_summary": {
     "KA_LIF_SNN (Proposed)": {
-      "mean_f1": 99.84,
-      "std_f1": 0.03,
-      "mean_acc": 99.84,
-      "std_acc": 0.04,
-      "mean_synops": 482.4,
-      "modeled_energy_nj": 3.12,
-      "latency_us": 1.85
+      "mean_f1": 29.483721637737393,
+      "std_f1": 31.038841306706086,
+      "mean_acc": 50.465066666666665,
+      "std_acc": 0.9853894170494217,
+      "mean_synops": 1463.0875973333334
     },
     "RLIF_SNN": {
-      "mean_f1": 99.11,
-      "std_f1": 0.07,
-      "mean_acc": 99.12,
-      "std_acc": 0.08,
-      "mean_synops": 512.6,
-      "modeled_energy_nj": 3.35,
-      "latency_us": 1.96
-    },
-    "SCNN_1D": {
-      "mean_f1": 98.65,
-      "std_f1": 0.09,
-      "mean_acc": 98.65,
-      "std_acc": 0.10,
-      "mean_synops": 1240.0,
-      "modeled_energy_nj": 6.80,
-      "latency_us": 3.40
+      "mean_f1": 30.16513513494671,
+      "std_f1": 31.547430728013268,
+      "mean_acc": 50.369200000000006,
+      "std_acc": 0.9201225161988231,
+      "mean_synops": 1025.642432
     },
     "ALIF_SNN": {
-      "mean_f1": 98.40,
-      "std_f1": 0.11,
-      "mean_acc": 98.40,
-      "std_acc": 0.12,
-      "mean_synops": 620.5,
-      "modeled_energy_nj": 4.10,
-      "latency_us": 2.45
+      "mean_f1": 35.89717210684014,
+      "std_f1": 32.71814895517097,
+      "mean_acc": 50.14706666666666,
+      "std_acc": 0.871444076317802,
+      "mean_synops": 342.40826400000003
     },
     "PLIF_SNN": {
-      "mean_f1": 98.15,
-      "std_f1": 0.13,
-      "mean_acc": 98.15,
-      "std_acc": 0.14,
-      "mean_synops": 710.2,
-      "modeled_energy_nj": 4.80,
-      "latency_us": 2.25
+      "mean_f1": 34.46483345128897,
+      "std_f1": 33.073540528387355,
+      "mean_acc": 50.034933333333335,
+      "std_acc": 0.8339973024880921,
+      "mean_synops": 311.067392
     },
-    "LIF_SNN (Baseline)": {
-      "mean_f1": 97.20,
-      "std_f1": 0.16,
-      "mean_acc": 97.20,
-      "std_acc": 0.18,
-      "mean_synops": 850.0,
-      "modeled_energy_nj": 4.20,
-      "latency_us": 2.10
+    "SCNN_1D": {
+      "mean_f1": 32.82172193213607,
+      "std_f1": 33.42964546699489,
+      "mean_acc": 49.96946666666667,
+      "std_acc": 0.7957082091251286,
+      "mean_synops": 3.191154666666667
     },
-    "INT8_Quantized_MLP (Edge Baseline)": {
-      "mean_f1": 96.85,
-      "std_f1": 0.20,
-      "mean_acc": 96.85,
-      "std_acc": 0.22,
-      "mean_synops": 5248.0,
-      "modeled_energy_nj": 14.20,
-      "latency_us": 9.85
+    "LIF_SNN": {
+      "mean_f1": 36.01579886035201,
+      "std_f1": 32.888584044298476,
+      "mean_acc": 50.18266666666667,
+      "std_acc": 0.8663572039899247,
+      "mean_synops": 345.3757146666667
+    },
+    "INT8_Quantized_MLP (Baseline)": {
+      "mean_f1": 100.0,
+      "std_f1": 0.0,
+      "mean_acc": 100.0,
+      "std_acc": 0.0,
+      "mean_synops": 4736.0
+    }
+  },
+  "statistical_tests_df299": {
+    "KA-LIF vs RLIF_SNN": {
+      "mean_diff": -0.6814134972093213,
+      "std_diff": 40.15427373006632,
+      "ci_95": [
+        -5.243680739478966,
+        3.8808537450603233
+      ],
+      "t_stat": -0.2939270689002668,
+      "t_pval": 0.7690175630609506,
+      "wilcoxon_stat": 10559.0,
+      "wilcoxon_pval_exact": 0.7221667543042698,
+      "cohen_dz": -0.0169698872309425,
+      "cohen_h": -0.014894915544059861
+    },
+    "KA-LIF vs ALIF_SNN": {
+      "mean_diff": -6.413450469102746,
+      "std_diff": 46.945688231894565,
+      "ci_95": [
+        -11.747347852628462,
+        -1.0795530855770306
+      ],
+      "t_stat": -2.366228397683906,
+      "t_pval": 0.018607788590748076,
+      "wilcoxon_stat": 13212.5,
+      "wilcoxon_pval_exact": 0.6057647842065716,
+      "cohen_dz": -0.13661426020759349,
+      "cohen_h": -0.1368740106880535
+    },
+    "KA-LIF vs PLIF_SNN": {
+      "mean_diff": -4.981111813551571,
+      "std_diff": 45.52642302405572,
+      "ci_95": [
+        -10.153754452206435,
+        0.19153082510329256
+      ],
+      "t_stat": -1.8950618489605842,
+      "t_pval": 0.059048684129804165,
+      "wilcoxon_stat": 12732.5,
+      "wilcoxon_pval_exact": 0.7478654750171719,
+      "cohen_dz": -0.10941144683880581,
+      "cohen_h": -0.10687814241076898
+    },
+    "KA-LIF vs SCNN_1D": {
+      "mean_diff": -3.33800029439868,
+      "std_diff": 42.66662829972473,
+      "ci_95": [
+        -8.185717425045626,
+        1.509716836248265
+      ],
+      "t_stat": -1.3550604619994513,
+      "t_pval": 0.17642114365375308,
+      "wilcoxon_stat": 10019.5,
+      "wilcoxon_pval_exact": 0.23007758528164135,
+      "cohen_dz": -0.07823445223202395,
+      "cohen_h": -0.07210009582092214
+    },
+    "KA-LIF vs LIF_SNN": {
+      "mean_diff": -6.532077222614605,
+      "std_diff": 45.915680671723436,
+      "ci_95": [
+        -11.748946720574551,
+        -1.3152077246546598
+      ],
+      "t_stat": -2.4640579128993303,
+      "t_pval": 0.014299947459184838,
+      "wilcoxon_stat": 12566.5,
+      "wilcoxon_pval_exact": 0.5492723327452844,
+      "cohen_dz": -0.14226244990014214,
+      "cohen_h": -0.1393460569162175
+    },
+    "KA-LIF vs INT8_Quantized_MLP (Baseline)": {
+      "mean_diff": -70.5162783622626,
+      "std_diff": 31.038841306706082,
+      "ci_95": [
+        -74.04286409715934,
+        -66.98969262736586
+      ],
+      "t_stat": -39.34997949092909,
+      "t_pval": 2.9043555866865474e-120,
+      "wilcoxon_stat": 0.0,
+      "wilcoxon_pval_exact": 9.818186930595453e-91,
+      "cohen_dz": -2.271872124437471,
+      "cohen_h": -1.9936073657868472
     }
   }
 }

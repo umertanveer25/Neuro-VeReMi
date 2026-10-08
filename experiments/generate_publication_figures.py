@@ -24,12 +24,11 @@ results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "res
 os.makedirs(results_dir, exist_ok=True)
 
 # -------------------------------------------------------------------------------------------------
-# FIGURE 1: SNN Architecture Overview & Kinematic Spike Encoding Mechanisms
+# FIGURE 3: Kinematic Delta Modulation Encodings & Voltage Reset
 # -------------------------------------------------------------------------------------------------
-def generate_fig1_architecture():
+def generate_fig3_encoding():
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 
-    # Time steps
     t = np.linspace(0, 1.0, 100)
     sig = 0.5 + 0.4 * np.sin(2 * np.pi * 2 * t) + 0.04 * np.random.RandomState(42).randn(100)
 
@@ -60,13 +59,12 @@ def generate_fig1_architecture():
     spikes_out = []
     v = 0.0
     for i in range(1, 100):
-        # Kinematic-Aware decay modulation
         zeta_kin = abs(diff[i]) * 10.0
         beta_i = 0.88 * np.exp(-0.35 * zeta_kin)
         v = beta_i * v + (pos_spikes[i] * 0.45) - (neg_spikes[i] * 0.20)
         if v >= 0.75:
             spikes_out.append(t[i])
-            v = 0.0  # Reset
+            v = 0.0
         v_mem[i] = v
 
     axes[2].plot(t, v_mem, color="#9467bd", lw=2.0, label="KA-LIF Potential $u_i(t)$")
@@ -80,15 +78,15 @@ def generate_fig1_architecture():
     axes[2].legend(loc="upper right")
 
     plt.tight_layout()
-    out_path = os.path.join(results_dir, "Fig1_SNN_Architecture_and_Spike_Encodings.png")
+    out_path = os.path.join(results_dir, "Fig3_Spike_Encoding_and_Voltage_Reset.png")
     plt.savefig(out_path)
     plt.close()
     print(f"Generated {out_path}")
 
 # -------------------------------------------------------------------------------------------------
-# FIGURE 2: Multi-Architecture Performance & Latency across 7 Models
+# FIGURE 4: Multi-Architecture Performance & Latency across 7 Models
 # -------------------------------------------------------------------------------------------------
-def generate_fig2_performance():
+def generate_fig4_performance():
     models = [
         "INT8-MLP\n(Edge Baseline)",
         "LIF SNN\n(Baseline)",
@@ -135,15 +133,15 @@ def generate_fig2_performance():
     plt.title("Performance ($F_1$-Score) and Real-Time Latency Across 7 Architectures ($N=300$ Folds)", fontweight="bold", pad=15)
     ax1.grid(True, ls=":", alpha=0.5)
     plt.tight_layout()
-    out_path = os.path.join(results_dir, "Fig2_Intra_SNN_Performance_Comparison.png")
+    out_path = os.path.join(results_dir, "Fig4_Multi_Model_Performance_and_Latency.png")
     plt.savefig(out_path)
     plt.close()
     print(f"Generated {out_path}")
 
 # -------------------------------------------------------------------------------------------------
-# FIGURE 3: SNN Spike Raster & Membrane Potential Dynamics
+# FIGURE 5: SNN Spike Raster & Membrane Potential Dynamics
 # -------------------------------------------------------------------------------------------------
-def generate_fig3_raster_dynamics():
+def generate_fig5_raster():
     fig, axes = plt.subplots(2, 1, figsize=(11, 7), sharex=True)
 
     np.random.seed(101)
@@ -197,15 +195,15 @@ def generate_fig3_raster_dynamics():
     axes[1].legend(loc="upper left")
 
     plt.tight_layout()
-    out_path = os.path.join(results_dir, "Fig3_SNN_Spike_Raster_and_Membrane_Dynamics.png")
+    out_path = os.path.join(results_dir, "Fig5_Spike_Raster_and_Membrane_Dynamics.png")
     plt.savefig(out_path)
     plt.close()
     print(f"Generated {out_path}")
 
 # -------------------------------------------------------------------------------------------------
-# FIGURE 4: Energy vs Accuracy Pareto Frontier
+# FIGURE 6: Energy vs Accuracy Pareto Frontier
 # -------------------------------------------------------------------------------------------------
-def generate_fig4_energy_pareto():
+def generate_fig6_pareto():
     fig, ax = plt.subplots(figsize=(10, 6))
 
     models = [
@@ -241,15 +239,15 @@ def generate_fig4_energy_pareto():
     ax.legend(loc="lower right")
 
     plt.tight_layout()
-    out_path = os.path.join(results_dir, "Fig4_SynOps_and_Energy_Consumption_Pareto.png")
+    out_path = os.path.join(results_dir, "Fig6_Energy_Accuracy_Pareto_Frontier.png")
     plt.savefig(out_path)
     plt.close()
     print(f"Generated {out_path}")
 
 # -------------------------------------------------------------------------------------------------
-# FIGURE 5: Adversarial Drift & Multi-Node Byzantine Defense
+# FIGURE 7: Adversarial Drift & Multi-Node Byzantine Defense
 # -------------------------------------------------------------------------------------------------
-def generate_fig5_adversarial():
+def generate_fig7_adversarial():
     fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
 
     # Subplot A: Stealthy Gradual Drift Evasion
@@ -299,19 +297,18 @@ def generate_fig5_adversarial():
                          xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=9.5)
 
     plt.tight_layout()
-    out_path = os.path.join(results_dir, "Fig5_Adversarial_Drift_and_Byzantine_Robustness.png")
+    out_path = os.path.join(results_dir, "Fig7_Adversarial_Drift_and_Byzantine_Defense.png")
     plt.savefig(out_path)
     plt.close()
     print(f"Generated {out_path}")
 
 # -------------------------------------------------------------------------------------------------
-# FIGURE 6: Statistical Validation Boxplots across 300 Folds
+# FIGURE 8: Statistical Validation Boxplots across 300 Folds
 # -------------------------------------------------------------------------------------------------
-def generate_fig6_boxplots():
+def generate_fig8_boxplots():
     fig, ax = plt.subplots(figsize=(11, 5.5))
 
     np.random.seed(42)
-    # 300-Fold CV distributions
     data = [
         np.random.normal(96.85, 0.20, 300),
         np.random.normal(97.20, 0.16, 300),
@@ -331,7 +328,7 @@ def generate_fig6_boxplots():
         "KA-LIF SNN\n(Proposed)"
     ]
 
-    bp = ax.boxplot(data, patch_artist=True, labels=labels, notch=True, vert=True)
+    bp = ax.boxplot(data, patch_artist=True, tick_labels=labels, notch=True, vert=True)
     colors = ["#c7c7c7", "#1f77b4", "#aec7e8", "#ffbb78", "#98df8a", "#33a02c", "#2ca02c"]
 
     for patch, color in zip(bp["boxes"], colors):
@@ -352,20 +349,20 @@ def generate_fig6_boxplots():
     ax.text(6.5, 99.65, "*** ($p < 10^{-15}$, $t(299) = 24.81$, Cohen's $d_z = 1.82$)", ha="center", va="bottom", color="darkred", fontweight="bold", fontsize=9.5)
 
     plt.tight_layout()
-    out_path = os.path.join(results_dir, "Fig6_Statistical_Validation_Boxplots.png")
+    out_path = os.path.join(results_dir, "Fig8_Statistical_Validation_Boxplots.png")
     plt.savefig(out_path)
     plt.close()
     print(f"Generated {out_path}")
 
 def main():
-    print("\n--- Generating All 6 Publication Figures for Neuro-VeReMi ---")
-    generate_fig1_architecture()
-    generate_fig2_performance()
-    generate_fig3_raster_dynamics()
-    generate_fig4_energy_pareto()
-    generate_fig5_adversarial()
-    generate_fig6_boxplots()
-    print("--- All Publication Figures Successfully Generated at 300 DPI ---")
+    print("\n--- Generating All Standardized Publication Figures for Neuro-VeReMi ---")
+    generate_fig3_encoding()
+    generate_fig4_performance()
+    generate_fig5_raster()
+    generate_fig6_pareto()
+    generate_fig7_adversarial()
+    generate_fig8_boxplots()
+    print("--- All Standardized Publication Figures Successfully Generated at 300 DPI ---")
 
 if __name__ == "__main__":
     main()
