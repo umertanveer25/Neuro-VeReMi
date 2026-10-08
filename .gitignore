@@ -9,3 +9,15 @@ build/
 .vscode/
 .idea/
 *.log
+*.aux
+*.out
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+*.tex
+*.cls
+*.pdf
+*.zip
+reviewer_*.md
+overleaf_staging/
