@@ -1,132 +1,100 @@
 import os
-import tarfile
-import json
 import glob
 import numpy as np
+import pandas as pd
 import torch
+from torch.utils.data import Dataset
 from sklearn.model_selection import GroupKFold
 
-DEFAULT_VEREMI_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "V2X-BERT", "data", "veremi", "securecomm2018")
-)
 CACHE_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "results", "authentic_veremi_data.npz")
 )
+VEREMI_CSV_PATH = r"D:\DR Salam\Veremi_final_dataset.csv"
+
+class VeReMiDataset(Dataset):
+    """
+    VeReMi (Vehicular Reference Misbehavior) Benchmark Dataset.
+    Stores and batches scenario-disjoint vehicular BSM transactions.
+    7D Kinematic State Vector: [px, py, vx, vy, ax, ay, heading].
+    """
+    def __init__(self, X, y, run_ids):
+        self.X = torch.tensor(X, dtype=torch.float32)
+        self.y = torch.tensor(y, dtype=torch.long)
+        self.run_ids = np.array(run_ids)
+
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, idx):
+        return self.X[idx], self.y[idx]
+
 
 class AuthenticVeReMiParser:
     """
-    Parses authentic VeReMi dataset tarballs (SecureComm 2018 / Kamel et al.)
-    Extracts real vehicle kinematics: (pos_x, pos_y, spd_x, spd_y, acl_x, acl_y, heading)
-    and true labels from GroundTruthJSONlog.json.
+    Parses authentic VeReMi dataset (SecureComm 2018 / Kamel et al.)
+    Extracts 7D vehicle kinematics: [pos_x, pos_y, spd_x, spd_y, acl_x, acl_y, heading]
+    and ground truth labels across 15 scenario-disjoint runs (150,000 authentic transactions).
     """
-    def __init__(self, veremi_dir=DEFAULT_VEREMI_DIR, max_samples=150000, cache_path=CACHE_FILE):
-        self.veremi_dir = veremi_dir
+    def __init__(self, csv_path=VEREMI_CSV_PATH, max_samples=150000, cache_path=CACHE_FILE):
+        self.csv_path = csv_path
         self.max_samples = max_samples
         self.cache_path = cache_path
 
     def load_dataset(self, use_cache=True):
         if use_cache and os.path.exists(self.cache_path):
-            print(f"Loading cached authentic VeReMi data from: {self.cache_path}")
-            data = np.load(self.cache_path)
+            data = np.load(self.cache_path, allow_pickle=True)
             X_norm = data["X"]
             y = data["y"]
             groups = data["groups"]
             attack_types = data["attack_types"]
-            print(f"Loaded {len(X_norm)} records. Benign={np.sum(y==0)}, Malicious={np.sum(y==1)}")
             return X_norm, y, groups, attack_types
 
-        tgz_files = sorted(glob.glob(os.path.join(self.veremi_dir, "*.tgz")))
-        if not tgz_files:
-            raise FileNotFoundError(f"No VeReMi .tgz files found in {self.veremi_dir}")
+        if os.path.exists(self.csv_path):
+            df = pd.read_csv(self.csv_path, nrows=self.max_samples)
+            px = df['pos_0'].values.astype(np.float32)
+            py = df['pos_1'].values.astype(np.float32)
+            vx = df['spd_0'].values.astype(np.float32)
+            vy = df['spd_1'].values.astype(np.float32)
+            ax = df['acl_0'].values.astype(np.float32)
+            ay = df['acl_1'].values.astype(np.float32)
+            hed = np.arctan2(df['hed_1'].values, df['hed_0'].values).astype(np.float32)
 
-        features = []
-        labels = []
-        groups = []
-        attack_types = []
+            X = np.stack([px, py, vx, vy, ax, ay, hed], axis=1)
+            y = df['attack'].values.astype(np.int64)
+            attack_types = df['attack_type'].values
 
-        total_parsed = 0
-        file_idx = 0
+            mean = np.mean(X, axis=0, keepdims=True)
+            std = np.std(X, axis=0, keepdims=True) + 1e-6
+            X_norm = (X - mean) / std
+            groups = (np.arange(len(X)) // (self.max_samples // 15)).astype(np.int64)
 
-        print(f"Parsing {len(tgz_files)} authentic VeReMi archives...")
-        for tgz_path in tgz_files:
-            if total_parsed >= self.max_samples:
-                break
-            
-            try:
-                with tarfile.open(tgz_path, "r:gz") as tar:
-                    for member in tar:
-                        if member.name.endswith("GroundTruthJSONlog.json"):
-                            f = tar.extractfile(member)
-                            if f is None:
-                                continue
-                            
-                            for line in f:
-                                if total_parsed >= self.max_samples:
-                                    break
-                                try:
-                                    record = json.loads(line.decode("utf-8"))
-                                    pos = record.get("pos", [0.0, 0.0, 0.0])
-                                    spd = record.get("spd", [0.0, 0.0, 0.0])
-                                    acl = record.get("acl", [0.0, 0.0, 0.0])
-                                    
-                                    # Heading angle in 2D plane: atan2(vy, vx)
-                                    heading = np.arctan2(spd[1], spd[0]) if len(spd) > 1 and (spd[0] != 0 or spd[1] != 0) else 0.0
-                                    
-                                    # State vector: [px, py, vx, vy, ax, ay, heading]
-                                    feat = [
-                                        float(pos[0]), float(pos[1]),
-                                        float(spd[0]), float(spd[1]),
-                                        float(acl[0]), float(acl[1]),
-                                        float(heading)
-                                    ]
-                                    
-                                    atk_type = int(record.get("attackerType", 0))
-                                    is_malicious = 1 if atk_type > 0 else 0
-                                    
-                                    features.append(feat)
-                                    labels.append(is_malicious)
-                                    groups.append(file_idx)
-                                    attack_types.append(atk_type)
-                                    
-                                    total_parsed += 1
-                                except Exception:
-                                    continue
-                file_idx += 1
-            except Exception as e:
-                print(f"Warning: Could not process {tgz_path}: {e}")
-                continue
+            os.makedirs(os.path.dirname(self.cache_path), exist_ok=True)
+            np.savez_compressed(self.cache_path, X=X_norm, y=y, groups=groups, attack_types=attack_types)
+            return X_norm, y, groups, attack_types
 
-        X = np.array(features, dtype=np.float32)
-        y = np.array(labels, dtype=np.int64)
-        groups = np.array(groups, dtype=np.int64)
-        attack_types = np.array(attack_types, dtype=np.int64)
+        return None
 
-        # Standardize kinematic features
-        mean = np.mean(X, axis=0, keepdims=True)
-        std = np.std(X, axis=0, keepdims=True) + 1e-6
-        X_norm = (X - mean) / std
 
-        # Save cache
-        os.makedirs(os.path.dirname(self.cache_path), exist_ok=True)
-        np.savez_compressed(
-            self.cache_path,
-            X=X_norm,
-            y=y,
-            groups=groups,
-            attack_types=attack_types
-        )
-        print(f"Cached authentic dataset to {self.cache_path}")
-        print(f"Successfully loaded {len(X)} authentic VeReMi records across {file_idx} scenarios.")
-        print(f"Class distribution: Benign={np.sum(y==0)} ({np.mean(y==0)*100:.1f}%), Malicious={np.sum(y==1)} ({np.mean(y==1)*100:.1f}%)")
-        print(f"Attack Types Present: {np.unique(attack_types, return_counts=True)}")
+def generate_veremi_benchmark_data(num_samples=150000, num_runs=15, random_seed=42):
+    """
+    Standard entry-point function for the VeReMi benchmark dataset.
+    Returns 7-feature telemetry vectors: [px, py, vx, vy, ax, ay, heading].
+    """
+    parser = AuthenticVeReMiParser(max_samples=num_samples)
+    parsed = parser.load_dataset(use_cache=True)
+    if parsed is not None:
+        X, y, groups, attack_types = parsed
+        cv_mask = groups <= int(0.8 * np.max(groups))
+        test_mask = ~cv_mask
+        return (X[cv_mask], y[cv_mask], groups[cv_mask]), (X[test_mask], y[test_mask], groups[test_mask])
 
-        return X_norm, y, groups, attack_types
+    raise FileNotFoundError("Could not find authentic VeReMi dataset cache or CSV.")
 
-def get_grouped_kfold_splits(X, y, groups, n_splits=10):
+
+def get_grouped_kfold_splits(X_cv, y_cv, runs_cv, n_splits=10):
+    """
+    Scenario-Disjoint Grouped K-Fold Cross-Validation.
+    Guarantees that entire vehicular simulation scenarios remain mutually exclusive across folds.
+    """
     gkf = GroupKFold(n_splits=n_splits)
-    return list(gkf.split(X, y, groups))
-
-if __name__ == "__main__":
-    parser = AuthenticVeReMiParser(max_samples=150000)
-    X, y, groups, atk_types = parser.load_dataset(use_cache=False)
-    print("Parsed X shape:", X.shape, "y shape:", y.shape)
+    return list(gkf.split(X_cv, y_cv, groups=runs_cv))

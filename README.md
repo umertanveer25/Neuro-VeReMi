@@ -5,14 +5,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Validation](https://img.shields.io/badge/Validation-30x10--Fold%20CV%20(N=2,100)-brightgreen.svg)]()
 [![Hardware](https://img.shields.io/badge/Hardware-28nm%20CMOS%20%26%20ARM%20Cortex--R52-purple.svg)]()
-[![Safety](https://img.shields.io/badge/ISO%2026262-ASIL--D%20Deterministic%20(15.75%C2%B5s%20WCET)-blue.svg)]()
+[![Safety](https://img.shields.io/badge/ISO%2026262-ASIL--D%20Targeted%20(18.80%C2%B5s%20WCET)-blue.svg)]()
 
 ---
 
 ## 📌 1. System Architecture & End-to-End Pipeline
 
 ![Figure 1: System Architecture & End-to-End Pipeline](results/Fig1_System_Architecture_Pipeline.png)
-*Fig. 1: Complete end-to-end dataflow pipeline of Neuro-VeReMi: (1) 100 Hz V2X telemetry ingestion with multipath Rayleigh fading and Doppler filtering; (2) Asynchronous Delta Modulation converting continuous kinematic residuals $r_p(t)$ into bipolar event streams $s_{\text{in}}(t)$; (3) Three-layer Spiking Neural Network featuring Kinematic-Aware Adaptive Decay (KA-LIF) neurons and recurrent temporal synapses; (4) Dynamic Multi-Hop Trust Engine ($\mathcal{H}_i$) and ISO 26262 ASIL-D automotive ECU actuation executing in $<1.85\,\mu\text{s}$ with $3.12\,\text{nJ}$ energy consumption.*
+*Fig. 1: Complete end-to-end dataflow pipeline of Neuro-VeReMi: (1) 100 Hz V2X telemetry ingestion with multipath Rayleigh fading and Doppler filtering; (2) Asynchronous Delta Modulation converting continuous 7D kinematic residuals $r_p(t)$ into 14 bipolar event streams $s_{\text{in}}(t)$; (3) Three-layer Spiking Neural Network ($14 \to 64 \to 32 \to 2$, totaling 3,008 INT8 synapses) featuring Kinematic-Aware Adaptive Decay (KA-LIF) neurons and dynamic current injection; (4) Dynamic Multi-Hop Trust Engine ($\mathcal{H}_i$) and ISO 26262 ASIL-D automotive ECU actuation executing in $<1.85\,\mu\text{s}$ with $3.12\,\text{nJ}$ energy consumption.*
 
 ---
 
@@ -33,7 +33,7 @@
 ## ⚙️ 4. Automotive AUTOSAR & ISO 26262 ASIL-D Embedded Deployment
 
 ![Figure 4: Automotive AUTOSAR & ISO 26262 ASIL-D Embedded Deployment](results/Fig4_AUTOSAR_ASIL_D_Deployment.png)
-*Fig. 4: Automotive Electronic Control Unit (ECU) deployment architecture across ARM Cortex-R52 and Infineon AURIX TC397: (Left) AUTOSAR Classic/Adaptive Software Component (SW-C) running as a 100 Hz runnable with zero-malloc MISRA-C:2012 static memory allocation; (Middle) Real-Time Safety Engine guaranteeing an execution time of $1.85\,\mu\text{s}$ ($15.75\,\mu\text{s}$ WCET, $634\times$ safety margin); (Right) Dual-path actuation isolating anomalies.*
+*Fig. 4: Automotive Electronic Control Unit (ECU) deployment architecture across ARM Cortex-R52 and Infineon AURIX TC397: (Left) AUTOSAR Classic/Adaptive Software Component (SW-C) running as a 100 Hz runnable with zero-malloc MISRA-C:2012 static memory allocation (5.38 KB Flash ROM, 0.45 KB SRAM); (Middle) Real-Time Safety Engine guaranteeing an execution time of $1.85\,\mu\text{s}$ ($18.80\,\mu\text{s}$ WCET, $531.9\times$ safety margin under 10 ms deadline); (Right) Dual-path actuation isolating anomalies.*
 
 ---
 
@@ -50,7 +50,7 @@
 | `ALIF_SNN` | $98.40 \pm 0.12$ | $98.32$ | $98.48$ | $98.40 \pm 0.11$ | $[98.28, 98.52]$ | $1.68$ | $0.9950$ | $620.5\text{ SynOps}$ | $4.10\,\text{nJ}$ | $2.45\,\mu\text{s}$ |
 | `PLIF_SNN` | $98.15 \pm 0.14$ | $98.02$ | $98.28$ | $98.15 \pm 0.13$ | $[98.00, 98.30]$ | $1.98$ | $0.9934$ | $710.2\text{ SynOps}$ | $4.80\,\text{nJ}$ | $2.25\,\mu\text{s}$ |
 | `LIF_SNN (Baseline)` | $97.20 \pm 0.18$ | $97.05$ | $97.35$ | $97.20 \pm 0.16$ | $[97.02, 97.38]$ | $2.95$ | $0.9890$ | $850.0\text{ SynOps}$ | $4.20\,\text{nJ}$ | $2.10\,\mu\text{s}$ |
-| `INT8_Quantized_MLP` | $96.85 \pm 0.22$ | $96.70$ | $97.00$ | $96.85 \pm 0.20$ | $[96.62, 97.08]$ | $3.30$ | $0.9845$ | $5,248.0\text{ MACs}$ | $14.20\,\text{nJ}$ | $9.85\,\mu\text{s}$ |
+| `INT8_Quantized_MLP` | $96.85 \pm 0.22$ | $96.70$ | $97.00$ | $96.85 \pm 0.20$ | $[96.62, 97.08]$ | $3.30$ | $0.9845$ | $3,008.0\text{ MACs}$ | $14.20\,\text{nJ}$ | $9.85\,\mu\text{s}$ |
 
 ---
 

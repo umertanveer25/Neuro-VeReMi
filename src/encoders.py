@@ -4,9 +4,12 @@ import numpy as np
 
 class DeltaModulationEncoder:
     """
-    Delta Modulation (Threshold) Spike Encoder.
-    Emits a spike when the temporal derivative / rate-of-change of a feature exceeds threshold theta.
-    Generates ternary/signed binary spike trains s in {-1, 0, 1} or dual-channel positive/negative spikes.
+    Asynchronous Kinematic Delta Modulation Spike Encoder.
+    Maps 7-dimensional continuous kinematic telemetry residuals into a 14-channel
+    bipolar spike event vector: S_in(t) in {0, 1}^14 (7 ON channels, 7 OFF channels).
+    Emits spikes when deviations exceed differential thresholds +/- theta_m:
+      S+_{k,m}(t) = Theta( Delta r_{k,m}(t) - theta_m )
+      S-_{k,m}(t) = Theta( -Delta r_{k,m}(t) - theta_m )
     """
     def __init__(self, threshold=0.08, num_steps=10):
         self.threshold = threshold
@@ -14,39 +17,39 @@ class DeltaModulationEncoder:
 
     def encode(self, x_seq):
         """
-        x_seq: Tensor of shape (Batch, Seq_Len, Features) or (Batch, Features)
-        Returns: Spike tensor of shape (Time_Steps, Batch, 2 * Features) (ON/OFF channels)
+        x_seq: Tensor of shape (Batch, 7) or (Batch, Seq_Len, 7)
+        Returns: Spike tensor of shape (Time_Steps, Batch, 14)
         """
         if x_seq.dim() == 2:
-            # Replicate over time with linear interpolation / temporal decay
             batch_size, num_features = x_seq.shape
             x_time = x_seq.unsqueeze(1).repeat(1, self.num_steps, 1)
-            # Add subtle temporal trend based on kinematic momentum
-            trend = torch.linspace(0.85, 1.0, self.num_steps).unsqueeze(0).unsqueeze(2).to(x_seq.device)
+            # Add temporal dynamic trend modeling car-following trajectory evolution
+            trend = torch.linspace(0.92, 1.0, self.num_steps).unsqueeze(0).unsqueeze(2).to(x_seq.device)
             x_time = x_time * trend
         else:
             x_time = x_seq
             batch_size, self.num_steps, num_features = x_time.shape
 
-        # Compute temporal derivative dx/dt
+        # Compute temporal derivative dx/dt across successive time steps
         diff = torch.zeros_like(x_time)
         diff[:, 1:, :] = x_time[:, 1:, :] - x_time[:, :-1, :]
-        diff[:, 0, :] = x_time[:, 0, :] * 0.1  # Initial boundary spike
+        diff[:, 0, :] = x_time[:, 0, :] * 0.15  # Initial step boundary condition
 
-        # Separate into positive (ON) and negative (OFF) spike channels
+        # Emits dual-rail ON (positive jerk/deviation) and OFF (negative) spikes
         pos_spikes = (diff > self.threshold).float()
         neg_spikes = (diff < -self.threshold).float()
 
-        # Concatenate ON and OFF channels: shape (Batch, Time_Steps, 2 * Features)
+        # Concatenate ON and OFF channels -> shape (Batch, Time_Steps, 2 * num_features) = (Batch, Time_Steps, 14)
         spikes = torch.cat([pos_spikes, neg_spikes], dim=-1)
-        # Permute to (Time_Steps, Batch, 2 * Features) for SNN ingestion
+        # Permute to (Time_Steps, Batch, 14) for temporal SNN execution
         return spikes.permute(1, 0, 2)
 
 
 class PoissonRateEncoder:
     """
-    Poisson Rate Coding.
+    Poisson Rate Spike Encoder.
     Maps continuous normalized feature intensities into stochastic Bernoulli spike trains.
+    Produces dual-rail 14-channel output for architecture compatibility.
     """
     def __init__(self, num_steps=10, max_rate=0.85):
         self.num_steps = num_steps
@@ -54,23 +57,27 @@ class PoissonRateEncoder:
 
     def encode(self, x):
         """
-        x: Tensor of shape (Batch, Features) with values normalized to [0, 1]
-        Returns: Spike tensor of shape (Time_Steps, Batch, Features)
+        x: Tensor of shape (Batch, 7)
+        Returns: Spike tensor of shape (Time_Steps, Batch, 14)
         """
         batch_size, num_features = x.shape
-        x_norm = torch.clamp(torch.abs(x), 0.0, 1.0) * self.max_rate
+        x_pos = torch.clamp(x, min=0.0)
+        x_neg = torch.clamp(-x, min=0.0)
+        x_dual = torch.cat([x_pos, x_neg], dim=-1)  # (Batch, 14)
+        
+        norm_rate = torch.clamp(x_dual * 0.5, 0.01, self.max_rate)
         # Expand over time steps
-        x_expanded = x_norm.unsqueeze(0).repeat(self.num_steps, 1, 1)
-        # Stochastic Bernoulli trial
-        rand_tensor = torch.rand_like(x_expanded)
-        spikes = (rand_tensor < x_expanded).float()
+        expanded_rate = norm_rate.unsqueeze(0).repeat(self.num_steps, 1, 1)
+        rand_tensor = torch.rand_like(expanded_rate)
+        spikes = (rand_tensor < expanded_rate).float()
         return spikes
 
 
 class LatencyEncoder:
     """
-    Latency / Time-to-First-Spike (TTFS) Coding.
-    Higher continuous values fire a spike earlier in the temporal window.
+    Time-to-First-Spike (TTFS) Latency Spike Encoder.
+    Higher continuous values trigger spikes earlier in the temporal evaluation window.
+    Produces dual-rail 14-channel output for architecture compatibility.
     """
     def __init__(self, num_steps=10, tau=1.0):
         self.num_steps = num_steps
@@ -78,16 +85,18 @@ class LatencyEncoder:
 
     def encode(self, x):
         """
-        x: Tensor of shape (Batch, Features) with values in [0, 1]
-        Returns: Spike tensor of shape (Time_Steps, Batch, Features)
+        x: Tensor of shape (Batch, 7)
+        Returns: Spike tensor of shape (Time_Steps, Batch, 14)
         """
         batch_size, num_features = x.shape
-        x_norm = torch.clamp(torch.abs(x), 0.001, 1.0)
-        # Compute exact spike arrival timestep: t_spike = floor((1 - x) * (num_steps - 1))
-        t_spikes = torch.clamp(((1.0 - x_norm) * (self.num_steps - 1)).long(), 0, self.num_steps - 1)
+        x_pos = torch.clamp(x, min=0.0)
+        x_neg = torch.clamp(-x, min=0.0)
+        x_dual = torch.cat([x_pos, x_neg], dim=-1)  # (Batch, 14)
 
-        spikes = torch.zeros((self.num_steps, batch_size, num_features), device=x.device)
+        norm_val = torch.clamp(x_dual * 0.5, 0.001, 1.0)
+        t_spikes = torch.clamp(((1.0 - norm_val) * (self.num_steps - 1)).long(), 0, self.num_steps - 1)
+
+        spikes = torch.zeros((self.num_steps, batch_size, 14), device=x.device)
         for t in range(self.num_steps):
-            mask = (t_spikes == t).float()
-            spikes[t] = mask
+            spikes[t] = (t_spikes == t).float()
         return spikes

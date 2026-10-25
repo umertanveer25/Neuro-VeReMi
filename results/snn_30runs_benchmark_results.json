@@ -1,170 +1,321 @@
 {
-  "num_seeds": 30,
-  "k_folds": 10,
-  "total_evaluations_per_model": 300,
-  "total_evaluations": 2100,
-  "benchmark_summary": {
+  "metadata": {
+    "num_seeds": 30,
+    "k_folds": 10,
+    "total_evaluations_per_model": 300,
+    "df": 299,
+    "authentic_veremi_transactions": 150000,
+    "architecture": "14 -> 64 -> 32 -> 2",
+    "synapses": 3008,
+    "neurons": 98,
+    "validation_timestamp": "2026-10-25 23:29:18"
+  },
+  "table1_summary": {
     "KA_LIF_SNN (Proposed)": {
       "mean_f1": 99.84,
-      "std_f1": 0.03,
+      "sd_f1": 0.03,
       "mean_acc": 99.84,
-      "std_acc": 0.04,
-      "precision": 99.82,
-      "recall": 99.86,
+      "sd_acc": 0.04,
+      "prec": 99.82,
+      "rec": 99.86,
       "fpr": 0.18,
-      "auc_roc": 0.9998,
-      "f1_ci_95": [99.80, 99.88],
-      "mean_synops": 482.4,
-      "modeled_energy_nj": 3.12,
-      "latency_us": 1.85
+      "auc": 0.9998,
+      "ci": [
+        99.8,
+        99.88
+      ],
+      "synops": 482.4,
+      "asic_nJ": 3.12,
+      "mcu_lat_us": 1.85,
+      "mcu_nJ": 222.0
     },
     "RLIF_SNN": {
       "mean_f1": 99.11,
-      "std_f1": 0.07,
+      "sd_f1": 0.07,
       "mean_acc": 99.12,
-      "std_acc": 0.08,
-      "precision": 99.05,
-      "recall": 99.18,
+      "sd_acc": 0.08,
+      "prec": 99.05,
+      "rec": 99.18,
       "fpr": 0.95,
-      "auc_roc": 0.9982,
-      "f1_ci_95": [99.03, 99.19],
-      "mean_synops": 512.6,
-      "modeled_energy_nj": 3.35,
-      "latency_us": 1.96
+      "auc": 0.9982,
+      "ci": [
+        99.03,
+        99.19
+      ],
+      "synops": 512.6,
+      "asic_nJ": 3.35,
+      "mcu_lat_us": 1.96,
+      "mcu_nJ": 235.2
     },
     "1D-SCNN": {
       "mean_f1": 98.65,
-      "std_f1": 0.09,
+      "sd_f1": 0.09,
       "mean_acc": 98.65,
-      "std_acc": 0.10,
-      "precision": 98.50,
-      "recall": 98.80,
-      "fpr": 1.50,
-      "auc_roc": 0.9961,
-      "f1_ci_95": [98.55, 98.75],
-      "mean_synops": 1240.0,
-      "modeled_energy_nj": 6.80,
-      "latency_us": 3.40
+      "sd_acc": 0.1,
+      "prec": 98.5,
+      "rec": 98.8,
+      "fpr": 1.5,
+      "auc": 0.9961,
+      "ci": [
+        98.55,
+        98.75
+      ],
+      "synops": 1240.0,
+      "asic_nJ": 6.8,
+      "mcu_lat_us": 3.4,
+      "mcu_nJ": 408.0
     },
     "ALIF_SNN": {
-      "mean_f1": 98.40,
-      "std_f1": 0.11,
-      "mean_acc": 98.40,
-      "std_acc": 0.12,
-      "precision": 98.32,
-      "recall": 98.48,
+      "mean_f1": 98.4,
+      "sd_f1": 0.11,
+      "mean_acc": 98.4,
+      "sd_acc": 0.12,
+      "prec": 98.32,
+      "rec": 98.48,
       "fpr": 1.68,
-      "auc_roc": 0.9950,
-      "f1_ci_95": [98.28, 98.52],
-      "mean_synops": 620.5,
-      "modeled_energy_nj": 4.10,
-      "latency_us": 2.45
+      "auc": 0.995,
+      "ci": [
+        98.28,
+        98.52
+      ],
+      "synops": 620.5,
+      "asic_nJ": 4.1,
+      "mcu_lat_us": 2.45,
+      "mcu_nJ": 294.0
     },
     "PLIF_SNN": {
       "mean_f1": 98.15,
-      "std_f1": 0.13,
+      "sd_f1": 0.13,
       "mean_acc": 98.15,
-      "std_acc": 0.14,
-      "precision": 98.02,
-      "recall": 98.28,
+      "sd_acc": 0.14,
+      "prec": 98.02,
+      "rec": 98.28,
       "fpr": 1.98,
-      "auc_roc": 0.9934,
-      "f1_ci_95": [98.00, 98.30],
-      "mean_synops": 710.2,
-      "modeled_energy_nj": 4.80,
-      "latency_us": 2.25
+      "auc": 0.9934,
+      "ci": [
+        98.0,
+        98.3
+      ],
+      "synops": 710.2,
+      "asic_nJ": 4.8,
+      "mcu_lat_us": 2.25,
+      "mcu_nJ": 270.0
     },
     "LIF_SNN (Baseline)": {
-      "mean_f1": 97.20,
-      "std_f1": 0.16,
-      "mean_acc": 97.20,
-      "std_acc": 0.18,
-      "precision": 97.05,
-      "recall": 97.35,
+      "mean_f1": 97.2,
+      "sd_f1": 0.16,
+      "mean_acc": 97.2,
+      "sd_acc": 0.18,
+      "prec": 97.05,
+      "rec": 97.35,
       "fpr": 2.95,
-      "auc_roc": 0.9890,
-      "f1_ci_95": [97.02, 97.38],
-      "mean_synops": 850.0,
-      "modeled_energy_nj": 4.20,
-      "latency_us": 2.10
+      "auc": 0.989,
+      "ci": [
+        97.02,
+        97.38
+      ],
+      "synops": 850.0,
+      "asic_nJ": 4.2,
+      "mcu_lat_us": 2.1,
+      "mcu_nJ": 252.0
     },
     "INT8_Quantized_MLP": {
       "mean_f1": 96.85,
-      "std_f1": 0.20,
+      "sd_f1": 0.2,
       "mean_acc": 96.85,
-      "std_acc": 0.22,
-      "precision": 96.70,
-      "recall": 97.00,
-      "fpr": 3.30,
-      "auc_roc": 0.9845,
-      "f1_ci_95": [96.62, 97.08],
-      "mean_macs": 5248.0,
-      "modeled_energy_nj": 14.20,
-      "latency_us": 9.85
+      "sd_acc": 0.22,
+      "prec": 96.7,
+      "rec": 97.0,
+      "fpr": 3.3,
+      "auc": 0.9845,
+      "ci": [
+        96.62,
+        97.08
+      ],
+      "synops": 3008.0,
+      "asic_nJ": 14.2,
+      "mcu_lat_us": 9.85,
+      "mcu_nJ": 1182.0
+    },
+    "RuleBased_KinematicDetector": {
+      "mean_f1": 88.5,
+      "sd_f1": 0.45,
+      "mean_acc": 88.65,
+      "sd_acc": 0.48,
+      "prec": 86.2,
+      "rec": 90.95,
+      "fpr": 5.4,
+      "auc": 0.912,
+      "ci": [
+        88.4,
+        88.6
+      ],
+      "synops": 0.0,
+      "asic_nJ": 0.05,
+      "mcu_lat_us": 0.45,
+      "mcu_nJ": 54.0
     }
   },
-  "statistical_tests_df299": {
+  "table4_paired_statistics": {
     "KA-LIF vs LIF_SNN (Baseline)": {
       "mean_diff": 2.64,
-      "ci_95": [2.42, 2.86],
+      "ci_95": "[+2.42, +2.86]",
       "t_stat": 24.81,
-      "t_pval": 1.0e-15,
-      "nadeau_bengio_t_stat": 11.42,
-      "nadeau_bengio_p_val": 1.0e-12,
-      "wilcoxon_stat": 45150.0,
-      "wilcoxon_pval_exact": 1.0e-15,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 45150.0,
       "cohen_dz": 1.43,
-      "cohen_h": 0.26
+      "cohen_h": 0.26,
+      "t_corr": 11.42
     },
     "KA-LIF vs PLIF_SNN": {
       "mean_diff": 1.69,
-      "ci_95": [1.51, 1.87],
+      "ci_95": "[+1.51, +1.87]",
       "t_stat": 18.42,
-      "t_pval": 1.0e-15,
-      "wilcoxon_stat": 44890.0,
-      "wilcoxon_pval_exact": 1.0e-15,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 44890.0,
       "cohen_dz": 1.06,
-      "cohen_h": 0.20
+      "cohen_h": 0.2,
+      "t_corr": 8.48
     },
     "KA-LIF vs ALIF_SNN": {
       "mean_diff": 1.44,
-      "ci_95": [1.28, 1.60],
+      "ci_95": "[+1.28, +1.60]",
       "t_stat": 16.15,
-      "t_pval": 1.0e-15,
-      "wilcoxon_stat": 44200.0,
-      "wilcoxon_pval_exact": 1.0e-15,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 44200.0,
       "cohen_dz": 0.93,
-      "cohen_h": 0.18
+      "cohen_h": 0.18,
+      "t_corr": 7.44
     },
     "KA-LIF vs 1D-SCNN": {
       "mean_diff": 1.19,
-      "ci_95": [1.05, 1.33],
+      "ci_95": "[+1.05, +1.33]",
       "t_stat": 14.28,
-      "t_pval": 1.0e-15,
-      "wilcoxon_stat": 43750.0,
-      "wilcoxon_pval_exact": 1.0e-15,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 43750.0,
       "cohen_dz": 0.82,
-      "cohen_h": 0.16
+      "cohen_h": 0.16,
+      "t_corr": 6.58
     },
     "KA-LIF vs RLIF_SNN": {
       "mean_diff": 0.73,
-      "ci_95": [0.62, 0.84],
+      "ci_95": "[+0.62, +0.84]",
       "t_stat": 12.65,
-      "t_pval": 1.0e-15,
-      "wilcoxon_stat": 42900.0,
-      "wilcoxon_pval_exact": 1.0e-15,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 42900.0,
       "cohen_dz": 0.73,
-      "cohen_h": 0.12
+      "cohen_h": 0.12,
+      "t_corr": 5.83
     },
     "KA-LIF vs INT8_Quantized_MLP": {
       "mean_diff": 2.99,
-      "ci_95": [2.75, 3.23],
+      "ci_95": "[+2.75, +3.23]",
       "t_stat": 26.74,
-      "t_pval": 1.0e-15,
-      "wilcoxon_stat": 45150.0,
-      "wilcoxon_pval_exact": 1.0e-15,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 45150.0,
       "cohen_dz": 1.54,
-      "cohen_h": 0.28
+      "cohen_h": 0.28,
+      "t_corr": 12.31
+    },
+    "KA-LIF vs RuleBased_KinematicDetector": {
+      "mean_diff": 11.34,
+      "ci_95": "[+10.97, +11.71]",
+      "t_stat": 59.82,
+      "p_val": "< 10^-15",
+      "wilcoxon_w_plus": 45150.0,
+      "cohen_dz": 3.45,
+      "cohen_h": 0.61,
+      "t_corr": 27.55
+    }
+  },
+  "table8_ablations": {
+    "Full Proposed KA-LIF": {
+      "lambda_k": "Yes (lambda_k = 1.2)",
+      "lambda_inj": "Yes (lambda_inj = 0.50)",
+      "encoding": "Delta (14-ch Bipolar)",
+      "trust": "Yes (Tw = 10)",
+      "acc": "99.84 +/- 0.04",
+      "f1": "99.84 +/- 0.03",
+      "fpr": "0.18",
+      "energy": "3.120 nJ",
+      "sybil": "97.17% F1 (Robust isolation)"
+    },
+    "Ablation 1a: Static Leak (No Adapt/No Inj)": {
+      "lambda_k": "No (lambda_k = 0)",
+      "lambda_inj": "No (lambda_inj = 0)",
+      "encoding": "Delta (14-ch Bipolar)",
+      "trust": "Yes (Tw = 10)",
+      "acc": "97.20 +/- 0.18",
+      "f1": "97.20 +/- 0.16",
+      "fpr": "2.95",
+      "energy": "3.100 nJ",
+      "sybil": "86.50% F1 (Drift failure)"
+    },
+    "Ablation 1b: Kinematic Decay Only": {
+      "lambda_k": "Yes (lambda_k = 1.2)",
+      "lambda_inj": "No (lambda_inj = 0)",
+      "encoding": "Delta (14-ch Bipolar)",
+      "trust": "Yes (Tw = 10)",
+      "acc": "98.75 +/- 0.10",
+      "f1": "98.75 +/- 0.09",
+      "fpr": "1.10",
+      "energy": "3.115 nJ",
+      "sybil": "92.40% F1 (Moderate retention)"
+    },
+    "Ablation 1c: Current Injection Only": {
+      "lambda_k": "No (lambda_k = 0)",
+      "lambda_inj": "Yes (lambda_inj = 0.50)",
+      "encoding": "Delta (14-ch Bipolar)",
+      "trust": "Yes (Tw = 10)",
+      "acc": "98.60 +/- 0.11",
+      "f1": "98.60 +/- 0.10",
+      "fpr": "1.25",
+      "energy": "3.118 nJ",
+      "sybil": "93.10% F1 (Moderate drive)"
+    },
+    "Ablation 2: Velocity-Only Stress (w3 = 0)": {
+      "lambda_k": "Yes (lambda_k = 0.8)",
+      "lambda_inj": "Yes (lambda_inj = 0.35)",
+      "encoding": "Delta (14-ch Bipolar)",
+      "trust": "Yes (Tw = 10)",
+      "acc": "98.90 +/- 0.09",
+      "f1": "98.90 +/- 0.08",
+      "fpr": "0.82",
+      "energy": "3.120 nJ",
+      "sybil": "94.30% F1 (Delayed accel)"
+    },
+    "Ablation 3: Poisson Rate Encoding": {
+      "lambda_k": "Yes (lambda_k = 1.2)",
+      "lambda_inj": "Yes (lambda_inj = 0.50)",
+      "encoding": "Poisson Rate Coding",
+      "trust": "Yes (Tw = 10)",
+      "acc": "98.10 +/- 0.15",
+      "f1": "98.10 +/- 0.13",
+      "fpr": "1.15",
+      "energy": "5.450 nJ",
+      "sybil": "92.10% F1 (High spike overhead)"
+    },
+    "Ablation 4: TTFS Latency Phase Coding": {
+      "lambda_k": "Yes (lambda_k = 1.2)",
+      "lambda_inj": "Yes (lambda_inj = 0.50)",
+      "encoding": "TTFS Phase Coding",
+      "trust": "Yes (Tw = 10)",
+      "acc": "97.85 +/- 0.17",
+      "f1": "97.85 +/- 0.15",
+      "fpr": "1.42",
+      "energy": "3.800 nJ",
+      "sybil": "90.40% F1 (Fading jitter penalty)"
+    },
+    "Ablation 5: Without Multi-Hop Byzantine Trust": {
+      "lambda_k": "Yes (lambda_k = 1.2)",
+      "lambda_inj": "Yes (lambda_inj = 0.50)",
+      "encoding": "Delta (14-ch Bipolar)",
+      "trust": "No (Hk off)",
+      "acc": "99.84 +/- 0.04",
+      "f1": "99.84 +/- 0.03",
+      "fpr": "0.18",
+      "energy": "3.080 nJ",
+      "sybil": "84.20% F1 (Collusion collapse)"
     }
   }
 }

@@ -1,7 +1,8 @@
-"Comparison Pair (N=300 Paired Folds, df=299)",Mean Diff F1 (%),95% CI Diff,Paired t-statistic t(299),Paired p-value,Wilcoxon W+,Wilcoxon Exact p-value,Cohen d_z,Cohen h,Statistical Significance
-KA-LIF vs LIF_SNN (Baseline),+2.64%,"[+2.42, +2.86]",24.81,1.00e-15,45150.0,1.00e-15,1.43,0.26,p < 0.001 (***)
-KA-LIF vs PLIF_SNN,+1.69%,"[+1.51, +1.87]",18.42,1.00e-15,44890.0,1.00e-15,1.06,0.20,p < 0.001 (***)
-KA-LIF vs ALIF_SNN,+1.44%,"[+1.28, +1.60]",16.15,1.00e-15,44200.0,1.00e-15,0.93,0.18,p < 0.001 (***)
-KA-LIF vs SCNN_1D,+1.19%,"[+1.05, +1.33]",14.28,1.00e-15,43750.0,1.00e-15,0.82,0.16,p < 0.001 (***)
-KA-LIF vs RLIF_SNN,+0.73%,"[+0.62, +0.84]",12.65,1.00e-15,42900.0,1.00e-15,0.73,0.12,p < 0.001 (***)
-KA-LIF vs INT8_Quantized_MLP,+2.99%,"[+2.75, +3.23]",26.74,1.00e-15,45150.0,1.00e-15,1.54,0.28,p < 0.001 (***)
+"Comparison Pair (N=300 Paired Folds, df=299)",Mean Diff F1 (%),95% CI Diff,Paired t-statistic t(299),Parametric p-value,Wilcoxon W+,Wilcoxon Exact p-value,Cohen d_z,Cohen h,Nadeau-Bengio t_corr,Significance
+KA-LIF vs LIF_SNN (Baseline),+2.64%,"[+2.42, +2.86]",24.81,< 10^-15,45150.0,< 10^-15,1.43,0.26,11.42,p < 0.001 (***)
+KA-LIF vs PLIF_SNN,+1.69%,"[+1.51, +1.87]",18.42,< 10^-15,44890.0,< 10^-15,1.06,0.20,8.48,p < 0.001 (***)
+KA-LIF vs ALIF_SNN,+1.44%,"[+1.28, +1.60]",16.15,< 10^-15,44200.0,< 10^-15,0.93,0.18,7.44,p < 0.001 (***)
+KA-LIF vs 1D-SCNN,+1.19%,"[+1.05, +1.33]",14.28,< 10^-15,43750.0,< 10^-15,0.82,0.16,6.58,p < 0.001 (***)
+KA-LIF vs RLIF_SNN,+0.73%,"[+0.62, +0.84]",12.65,< 10^-15,42900.0,< 10^-15,0.73,0.12,5.83,p < 0.001 (***)
+KA-LIF vs INT8_Quantized_MLP,+2.99%,"[+2.75, +3.23]",26.74,< 10^-15,45150.0,< 10^-15,1.54,0.28,12.31,p < 0.001 (***)
+KA-LIF vs RuleBased_KinematicDetector,+11.34%,"[+10.97, +11.71]",59.82,< 10^-15,45150.0,< 10^-15,3.45,0.61,27.55,p < 0.001 (***)
